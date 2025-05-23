@@ -13,26 +13,22 @@ class CidadeService {
     return obj;
   }
 
-  static async findByUf(req) {
-    const { id } = req.params;
-    const objs = await Cidade.findAll({ where: { ufId: id }, include: { all: true, nested: true } });
-    return objs;
-  }
-
   static async create(req) {
-    const { nome, uf } = req.body;
+    const { nomeCidade, uf, codigo } = req.body;
     if (uf == null) throw 'A Uf da Cidade deve ser preenchida!';
-    const obj = await Cidade.create({ nome, ufId: uf.id });
+    if (codigo == null) throw 'O Codigo da Cidade deve ser preenchido!';
+    const obj = await Cidade.create({ nomeCidade, uf, codigo });
     return await Cidade.findByPk(obj.id, { include: { all: true, nested: true } });
   }
 
   static async update(req) {
     const { id } = req.params;
-    const { nome, uf } = req.body;
+    const { nomeCidade, uf, codigo } = req.body;
     if (uf == null) throw 'A Uf da Cidade deve ser preenchida!';
+    if (codigo == null) throw 'O Codigo da Cidade deve ser preenchido!';
     const obj = await Cidade.findByPk(id, { include: { all: true, nested: true } });
     if (obj == null) throw 'Cidade não encontrada!';
-    Object.assign(obj, { nome, ufId: uf.id });
+    Object.assign(obj, { nomeCidade, uf, codigo });
     await obj.save();
     return await Cidade.findByPk(obj.id, { include: { all: true, nested: true } });
   }
@@ -42,12 +38,8 @@ class CidadeService {
     const obj = await Cidade.findByPk(id);
     if (obj == null)
       throw 'Cidade não encontrada!';
-    try {
-      await obj.destroy();
-      return obj;
-    } catch (error) {
-      throw "Não é possível remover uma cidade com bairros!";
-    }
+    await obj.destroy();
+    return obj;
   }
 
 }

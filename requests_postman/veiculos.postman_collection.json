@@ -1,0 +1,445 @@
+{
+	"info": {
+		"_postman_id": "767b1fcd-664e-4968-92dc-8bb519076d7f",
+		"name": "veiculos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44411644",
+		"_collection_link": "https://pedro-5772357.postman.co/workspace/carona~e322b61b-4965-46a4-9f39-b1aac6782ebf/collection/44411644-767b1fcd-664e-4968-92dc-8bb519076d7f?action=share&source=collection_link&creator=44411644"
+	},
+	"item": [
+		{
+			"name": "findAll",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findByPk",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"JAS-1B95\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"1122334456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_motorista",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_modelo",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_placa",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_chassi",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_marca",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_put_sem_motorista",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_put_sem_modelo",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_put_sem_placa",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_put_sem_chassi",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"Chevrolet\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_put_sem_marca",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"motoristaId\": \"1\",\r\n    \"placa\": \"JAS-3A12\", \r\n    \"marca\": \"\",\r\n    \"modelo\": \"Camaro\",\r\n    \"chassi\": \"1122334455\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/veiculos/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"veiculos",
+						"5"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

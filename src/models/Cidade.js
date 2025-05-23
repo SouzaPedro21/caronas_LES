@@ -1,23 +1,37 @@
 import { Model, DataTypes } from 'sequelize';
-
+//HELIO BREDA NETTO
 class Cidade extends Model {
 
   static init(sequelize) {
     super.init({
-      nome: { 
-        type: DataTypes.STRING, 
+      nomeCidade: {
+        type: DataTypes.STRING,
         validate: {
-          notEmpty: { msg: "Nome da Cidade deve ser preenchida!" },
+          notEmpty: { msg: "Nome da Cidade deve ser preenchido!" },
           len: { args: [2, 50], msg: "Nome da Cidade deve ter entre 2 e 50 letras!" }
         }
-      }
-    }, { sequelize, modelName: 'cidade', tableName: 'cidades' })
-  }
+      },
+      uf: {
+        type: DataTypes.STRING,
+        validate: {
+          notEmpty: { msg: "a UF deve ser preenchida" },
+          len: { args: [2, 50], msg: "A UF deve seguir o padrão (XX)" }
+        }
+      },
+      codigo: {
+        type: DataTypes.STRING,
+        validate: {
+          notEmpty: { msg: "O codigo deve ser preenchida" },
+          len: { args: [2, 50], msg: "Codigo deve ter o padrão (xxxxxxx)" }
+        }
+      },
 
-  static associate(models) {
-    this.belongsTo(models.uf, {as: 'uf', foreignKey: {name: 'ufId' , allowNull: false, validate: {notNull: {msg: 'Uf da Cidade deve ser preenchida!'}}}});
+
+    }, { sequelize, modelName: 'Cidade', tableName: 'cidades' })
   }
-  
+  static associate(models) {
+    //this.hasMany(models.oferecimentoCarona, { as: 'oferecimentoCarona', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+  }
 }
 
 export { Cidade };

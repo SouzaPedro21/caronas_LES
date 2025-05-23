@@ -1,0 +1,331 @@
+{
+	"info": {
+		"_postman_id": "39926526-4b22-4964-b9d6-d9248a826d90",
+		"name": "motoristas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44411644",
+		"_collection_link": "https://pedro-5772357.postman.co/workspace/carona~e322b61b-4965-46a4-9f39-b1aac6782ebf/collection/44411644-39926526-4b22-4964-b9d6-d9248a826d90?action=share&source=collection_link&creator=44411644"
+	},
+	"item": [
+		{
+			"name": "findAll",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findByPk",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Gomes\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"cnh\": \"12345678910\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Games\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"12 12345-6789\",\r\n    \"cnh\": \"11223344556\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_cpf",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Gomes\",\r\n    \"cpf\": \"\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"cnh\": \"12345678910\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_put_sem_cpf",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Gomes\",\r\n    \"cpf\": \"\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"cnh\": \"12345678910\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_nome",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"cnh\": \"12345678910\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_put_sem_nome",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"cnh\": \"12345678910\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_cnh",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Gomes\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"cnh\": \"\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_put_sem_cnh",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Gomes\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"cnh\": \"\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas",
+						"5"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

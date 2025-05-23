@@ -1,0 +1,388 @@
+{
+	"info": {
+		"_postman_id": "c32933b7-fadd-4cd4-9cc4-2f411146da71",
+		"name": "clientes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44411644",
+		"_collection_link": "https://pedro-5772357.postman.co/workspace/carona~e322b61b-4965-46a4-9f39-b1aac6782ebf/collection/44411644-c32933b7-fadd-4cd4-9cc4-2f411146da71?action=share&source=collection_link&creator=44411644"
+	},
+	"item": [
+		{
+			"name": "findAll",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findByPk",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Gomes\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Games\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"98 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_nome",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cpf\": \"222.222.222-22\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_nome_caracteres",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"A\",\r\n    \"cpf\": \"222.222.222-22\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_sem_cpf",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Gomes\",\r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_post_cpf_caracteres",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Gomes\",\r\n    \"cpf\": \"22222111\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"89 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_update_sem_nome",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"98 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_update_nome_caracteres",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"d\",\r\n    \"cpf\": \"333.333.333-33\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"98 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_update_sem_cpf",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Games\",\r\n    \"cpf\": \"\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"98 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_update_cpf_caracteres",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"João Games\",\r\n    \"cpf\": \"22221322\", \r\n    \"sexo\": \"M\",\r\n    \"telefone\": \"98 12345-6789\",\r\n    \"nota\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/clientes/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"clientes",
+						"5"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
