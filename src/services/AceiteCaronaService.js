@@ -3,6 +3,7 @@ import { Cliente } from "../models/Cliente.js";
 import { OferecimentoCarona } from "../models/OferecimentoCarona.js";
 import { Op } from "sequelize";
 import sequelize from "../config/database-connection.js";
+//PEDRO HENRIQUE BRAIDO DE SOUZA
 
 class AceiteCaronaService {
   static async findAll() {

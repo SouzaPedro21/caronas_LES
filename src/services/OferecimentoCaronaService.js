@@ -2,6 +2,7 @@ import { OferecimentoCarona } from "../models/OferecimentoCarona.js";
 import { Veiculo } from "../models/Veiculo.js";
 import { Op } from "sequelize";
 import sequelize from "../config/database-connection.js";
+//HELIO BREDA NETTO
 
 class OferecimentoCaronaService {
   static async findAll() {

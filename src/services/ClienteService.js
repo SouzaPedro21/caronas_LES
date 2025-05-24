@@ -1,5 +1,6 @@
 import { Cliente } from "../models/Cliente.js";
 import sequelize from "../config/database-connection.js";
+//HELIO BREDA NETTO
 
 class ClienteService {
   static async findAll() {
