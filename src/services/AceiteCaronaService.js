@@ -2,9 +2,9 @@ import { AceiteCarona } from "../models/AceiteCarona.js";
 import { Cliente } from "../models/Cliente.js";
 import { OferecimentoCarona } from "../models/OferecimentoCarona.js";
 import { Op } from "sequelize";
+import sequelize from "../config/database-connection.js";
 
 class AceiteCaronaService {
-
   static async findAll() {
     const objs = await AceiteCarona.findAll({ include: { all: true, nested: true } });
     return objs;
@@ -18,20 +18,35 @@ class AceiteCaronaService {
 
   static async create(req) {
     const { clienteId, oferecimentoCaronaId } = req.body;
+    const errors = [];
     
+    // Validação dos campos obrigatórios
+    if (!clienteId) {
+      errors.push('O ID do cliente deve ser preenchido!');
+    }
+    
+    if (!oferecimentoCaronaId) {
+      errors.push('O ID da carona deve ser preenchido!');
+    }
+
+    // Se houver erros de validação, retorna todos eles
+    if (errors.length > 0) {
+      throw errors.join('\n');
+    }
+    
+    // Busca o cliente e a carona para validação
     const cliente = await Cliente.findByPk(clienteId);
     if (!cliente) throw "Cliente não encontrado!";
     
     const oferecimentoCarona = await OferecimentoCarona.findByPk(oferecimentoCaronaId);
     if (!oferecimentoCarona) throw "Carona não encontrada!";
     
-    // Adiciona os objetos completos ao req.body
+    // Adiciona os objetos completos ao req.body para as regras de negócio
     req.body.cliente = cliente;
     req.body.oferecimentoCarona = oferecimentoCarona;
 
     // Verifica as regras de negócio
-    const validacao = await this.verificarRegrasDeNegocio(req);
-    if (!validacao) throw "Não foi possível validar as regras de negócio!";
+    await this.verificarRegrasDeNegocio(req);
 
     // Verifica vagas disponíveis
     if (oferecimentoCarona.vagas <= 0) {
@@ -66,12 +81,13 @@ class AceiteCaronaService {
       console.error('Erro ao criar aceite:', error);
       throw "Erro ao criar o aceite de carona!";
     }
-}
+  }
 
   static async update(req) {
     const { id } = req.params;
     const { clienteId, oferecimentoCaronaId } = req.body;
     const obj = await AceiteCarona.findByPk(id, { include: { all: true, nested: true } });
+    if (obj == null) throw 'Aceite de carona não encontrado!';
     Object.assign(obj, { clienteId, oferecimentoCaronaId });
     await obj.save();
     return await AceiteCarona.findByPk(obj.id, { include: { all: true, nested: true } });
@@ -81,7 +97,7 @@ class AceiteCaronaService {
     const { id } = req.params;
     const obj = await AceiteCarona.findByPk(id);
     if (obj == null)
-      throw 'AceiteCarona não encontrada!';
+      throw 'Aceite de carona não encontrado!';
     await obj.destroy();
     return obj;
   }
@@ -93,48 +109,38 @@ class AceiteCaronaService {
     const caronasAgendadas = await AceiteCarona.findAll({
       where: { clienteId: cliente.id },
       include: [{
-        model: OferecimentoCarona,  // Mudança aqui: usar model ao invés de association
+        model: OferecimentoCarona,
         as: 'oferecimentoCarona',
-        required: true  // Garante que só trará registros com oferecimentoCarona
+        required: true
       }]
     });
 
     const inicioNova = new Date(oferecimentoCarona.data);
     const terminoNova = new Date(oferecimentoCarona.previsaoTermino);
 
-    console.log('Nova carona:', {
-      inicio: inicioNova,
-      termino: terminoNova
-    });
-
+    // Regra de Negócio 1: O Cliente não pode aceitar duas Caronas com horários sobrepostos
     for (let agendada of caronasAgendadas) {
       const inicioExistente = new Date(agendada.oferecimentoCarona.data);
       const terminoExistente = new Date(agendada.oferecimentoCarona.previsaoTermino);
 
-      console.log('Carona existente:', {
-        inicio: inicioExistente,
-        termino: terminoExistente
-      });
-
-      // Lógica simplificada e mais rigorosa
-      if (inicioNova <= terminoExistente && terminoNova >= inicioExistente) {
-        throw `Conflito de horário detectado:\n` +
-        `Carona existente: ${inicioExistente.toLocaleTimeString()} até ${terminoExistente.toLocaleTimeString()}\n` +
-        `Nova carona: ${inicioNova.toLocaleTimeString()} até ${terminoNova.toLocaleTimeString()}`;
+      // Verifica se há sobreposição de horários
+      if ((inicioNova >= inicioExistente && inicioNova < terminoExistente) ||
+          (terminoNova > inicioExistente && terminoNova <= terminoExistente) ||
+          (inicioNova <= inicioExistente && terminoNova >= terminoExistente)) {
+        throw "Não é possível aceitar esta carona pois existe conflito de horário com outra carona já aceita";
       }
     }
 
     // Regra de Negócio 2: O Cliente não pode aceitar mais que quatro Caronas no mesmo dia
     const dataDia = new Date(oferecimentoCarona.data).toISOString().slice(0, 10);
     const caronasMesmoDia = caronasAgendadas.filter(agendada => {
-      if (!agendada.oferecimentoCarona) return false;
       const dataAgendada = new Date(agendada.oferecimentoCarona.data).toISOString().slice(0, 10);
       return dataAgendada === dataDia;
     });
+
     if (caronasMesmoDia.length >= 4) {
       throw "O cliente não pode aceitar mais que quatro caronas no mesmo dia!";
     }
-    return true;
   }
 }
 

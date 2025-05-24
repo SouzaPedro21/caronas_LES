@@ -1,10 +1,7 @@
 import { Cliente } from "../models/Cliente.js";
-
-import { QueryTypes } from 'sequelize';
-import sequelize from '../config/database-connection.js';
+import sequelize from "../config/database-connection.js";
 
 class ClienteService {
-
   static async findAll() {
     const objs = await Cliente.findAll({ include: { all: true, nested: true } });
     return objs;
@@ -18,9 +15,8 @@ class ClienteService {
 
   static async create(req) {
     const { nome, cpf, sexo, telefone, nota } = req.body;
-    if (cpf == null) throw 'O CPF do Cliente deve ser preenchida!';
-    if (nome == null) throw 'O Nome do Cliente deve ser preenchida!';
-    return await Cliente.create({ nome, cpf, sexo, telefone, nota });
+    const obj = await Cliente.create({ nome, cpf, sexo, telefone, nota });
+    return await Cliente.findByPk(obj.id, { include: { all: true, nested: true } });
   }
 
   static async update(req) {
@@ -28,7 +24,8 @@ class ClienteService {
     const { nome, cpf, sexo, telefone, nota } = req.body;
     const obj = await Cliente.findByPk(id, { include: { all: true, nested: true } });
     if (obj == null) throw 'Cliente não encontrado!';
-    const t = await sequelize.transaction(); try {
+    const t = await sequelize.transaction();
+    try {
       Object.assign(obj, { nome, cpf, sexo, telefone, nota });
       await obj.save({ transaction: t });
       await t.commit();
@@ -50,7 +47,6 @@ class ClienteService {
       throw "Não é possível remover um cliente associado a caronas pendentes!";
     }
   }
-
 }
 
 export { ClienteService };

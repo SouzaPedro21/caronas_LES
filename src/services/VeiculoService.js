@@ -15,7 +15,6 @@ class VeiculoService {
 
   static async create(req) {
     const { placa, marca, modelo, chassi, motoristaId } = req.body;
-    if (motoristaId == null) throw 'O motorista do Veiculo deve ser preenchido!';
     const obj = await Veiculo.create({ placa, marca, modelo, chassi, motoristaId });
     return await Veiculo.findByPk(obj.id, { include: { all: true, nested: true } });
   }
@@ -23,10 +22,9 @@ class VeiculoService {
   static async update(req) {
     const { id } = req.params;
     const { placa, marca, modelo, chassi, motoristaId } = req.body;
-    if (placa == null) throw 'A Placa do Veiculo deve ser preenchida!';
     const obj = await Veiculo.findByPk(id, { include: { all: true, nested: true } });
     if (obj == null) throw 'Veiculo não encontrado!';
-    Object.assign(obj, { placa, marca, modelo, chassi, motoristaId }); // Atualiza os campos do objeto
+    Object.assign(obj, { placa, marca, modelo, chassi, motoristaId });
     await obj.save();
     return await Veiculo.findByPk(obj.id, { include: { all: true, nested: true } });
   }

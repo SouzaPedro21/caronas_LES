@@ -15,7 +15,6 @@ class MotoristaService {
 
   static async create(req) {
     const { nome, cpf, telefone, sexo, cnh, nota } = req.body;
-    // if (cnh == null) throw 'A CNH do Motorista deve ser preenchida!';
     const obj = await Motorista.create({ nome, cpf, telefone, sexo, cnh, nota });
     return await Motorista.findByPk(obj.id, { include: { all: true, nested: true } });
   }
@@ -23,7 +22,6 @@ class MotoristaService {
   static async update(req) {
     const { id } = req.params;
     const { nome, cpf, telefone, sexo, cnh, nota } = req.body;
-    if (cnh == null) throw 'A CNH do Motorista deve ser preenchida!';
     const obj = await Motorista.findByPk(id, { include: { all: true, nested: true } });
     if (obj == null) throw 'Motorista não encontrado!';
     Object.assign(obj, { nome, cpf, telefone, sexo, cnh, nota });

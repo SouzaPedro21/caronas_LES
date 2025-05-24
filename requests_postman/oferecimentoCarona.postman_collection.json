@@ -1,0 +1,244 @@
+{
+	"info": {
+		"_postman_id": "a9dfffb7-f92f-4329-935a-0f42b34df287",
+		"name": "oferecimentoCarona",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44411644",
+		"_collection_link": "https://pedro-5772357.postman.co/workspace/carona~e322b61b-4965-46a4-9f39-b1aac6782ebf/collection/44444060-a9dfffb7-f92f-4329-935a-0f42b34df287?action=share&source=collection_link&creator=44411644"
+	},
+	"item": [
+		{
+			"name": "findAll",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findByPk",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"veiculoId\": \"3\",\r\n    \"origemId\": \"2\", \r\n    \"destinoId\": \"2\",\r\n    \"data\": \"2025-10-10T10:10:00.000Z\",\r\n    \"previsaoTermino\": \"2025-10-10T11:40:00\",\r\n    \"vagas\": \"4\",\r\n    \"preco\": \"10.0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"veiculoId\": \"1\",\r\n    \"origemId\": \"2\", \r\n    \"destinoId\": \"3\",\r\n    \"data\": \"2023-10-02T10:10:00.000Z\",\r\n    \"previsaoDuracao\": \"01:30:00\",\r\n    \"vagas\": \"4\",\r\n    \"preco\": \"20\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_oferecimento",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"veiculoId\": \"1\",\r\n    \"data\": \"2023-10-10T10:10:00.000Z\",\r\n    \"previsaoTermino\": \"2023-10-10T11:40:00\",\r\n    \"vagas\": \"4\",\r\n    \"preco\": \"10.0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_oferecimento_em_andamento",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"veiculoId\": \"1\",\r\n    \"origemId\": \"2\", \r\n    \"destinoId\": \"2\",\r\n    \"data\": \"2025-10-10T10:10:00.000Z\",\r\n    \"previsaoTermino\": \"2025-10-10T11:40:00\",\r\n    \"vagas\": \"4\",\r\n    \"preco\": \"10.0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "erro_4_ofertas",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"veiculoId\": \"1\",\r\n    \"origemId\": \"2\", \r\n    \"destinoId\": \"2\",\r\n    \"data\": \"2025-10-01T08:00:00.000Z\",\r\n    \"previsaoTermino\": \"2025-10-01T09:00:00\",\r\n    \"vagas\": \"4\",\r\n    \"preco\": \"10.0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

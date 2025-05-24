@@ -15,8 +15,6 @@ class CidadeService {
 
   static async create(req) {
     const { nomeCidade, uf, codigo } = req.body;
-    if (uf == null) throw 'A Uf da Cidade deve ser preenchida!';
-    if (codigo == null) throw 'O Codigo da Cidade deve ser preenchido!';
     const obj = await Cidade.create({ nomeCidade, uf, codigo });
     return await Cidade.findByPk(obj.id, { include: { all: true, nested: true } });
   }
@@ -24,8 +22,6 @@ class CidadeService {
   static async update(req) {
     const { id } = req.params;
     const { nomeCidade, uf, codigo } = req.body;
-    if (uf == null) throw 'A Uf da Cidade deve ser preenchida!';
-    if (codigo == null) throw 'O Codigo da Cidade deve ser preenchido!';
     const obj = await Cidade.findByPk(id, { include: { all: true, nested: true } });
     if (obj == null) throw 'Cidade não encontrada!';
     Object.assign(obj, { nomeCidade, uf, codigo });

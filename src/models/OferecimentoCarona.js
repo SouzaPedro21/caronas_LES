@@ -11,12 +11,21 @@ class OferecimentoCarona extends Model {
                     notEmpty: { msg: "Data da carona deve ser preenchida" },
                     isDate: { msg: "Data da carona deve ser uma data" }
                 }
-            },
-            previsaoTermino: {
+            },            previsaoTermino: {
                 type: DataTypes.DATE,
                 validate: {
                     notEmpty: { msg: "Previsão de término da carona deve ser preenchida" },
-                    isDate: { msg: "Previsão de término da carona deve ser uma data" }
+                    isDate: { msg: "Previsão de término da carona deve ser uma data" },                    isAfterData(value) {
+                        const dataInicio = this.dataValues.data || this.data;
+                        if (dataInicio) {
+                            const dataInicioDate = new Date(dataInicio);
+                            const dataTerminoDate = new Date(value);
+                            
+                            if (dataTerminoDate <= dataInicioDate) {
+                                throw new Error('A previsão de término deve ser posterior à data de início da carona');
+                            }
+                        }
+                    }
                 }
             },
             vagas: {

@@ -1,54 +1,60 @@
 import { Model, DataTypes } from 'sequelize';
 //PEDRO HENRIQUE BRAIDO DE SOUZA
 class Motorista extends Model {
-
   static init(sequelize) {
     super.init({
       nome: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
-          notEmpty: { msg: "Nome do Motorista deve ser preenchido!" },
-          len: { args: [2, 50], msg: "Nome do Motorista deve ter entre 2 e 50 letras!" }
+          notNull: { msg: "O nome do motorista deve ser preenchido!" },
+          notEmpty: { msg: "O nome do motorista deve ser preenchido!" },
+          len: { args: [2, 50], msg: "O nome do motorista deve ter entre 2 e 50 letras!" }
         }
       },
-
       cpf: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
-          notEmpty: { msg: "CPF do Motorista deve ser preenchido!" },
-          is: { args: ["[0-9]{3}\.[0-9]{3}\.[0-9]{3}\-[0-9]{2}"], msg: "CPF do Cliente deve seguir o padrão NNN.NNN.NNN-NN!" },
+          notNull: { msg: "O CPF do motorista deve ser preenchido!" },
+          notEmpty: { msg: "O CPF do motorista deve ser preenchido!" },
+          is: { args: ["[0-9]{3}\\.[0-9]{3}\\.[0-9]{3}\\-[0-9]{2}"], msg: "O CPF do motorista deve seguir o padrão NNN.NNN.NNN-NN!" }
         }
       },
-
       sexo: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
-          notEmpty: { msg: "Sexo do Motorista deve ser preenchido!" },
-          len: { args: [1, 1], msg: "Sexo do Motorista deve ser M (Masculino) ou F (Feminino)!" }
+          notNull: { msg: "O sexo do motorista deve ser preenchido!" },
+          notEmpty: { msg: "O sexo do motorista deve ser preenchido!" },
+          isIn: {
+            args: [['M', 'F']],
+            msg: "O sexo do motorista deve ser M (Masculino) ou F (Feminino)!"
+          }
         }
       },
-
       telefone: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
-          notEmpty: { msg: "Telefone do Motorista deve ser preenchido!" },
-          is: { args: ["[0-9]{2} [0-9]{5}\-[0-9]{4}"], msg: "Telefone deve seguir o padrão XX XXXXX-XXXX!" }
+          notNull: { msg: "O telefone do motorista deve ser preenchido!" },
+          notEmpty: { msg: "O telefone do motorista deve ser preenchido!" },
+          is: { args: ["[0-9]{2} [0-9]{5}\\-[0-9]{4}"], msg: "O telefone deve seguir o padrão XX XXXXX-XXXX!" }
         }
       },
-
       cnh: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
-          notEmpty: { msg: "CNH do Motorista deve ser preenchido!" },
-          is: {args: ["[0-9]{11}"], msg: "CNH do Motorista deve seguir o padrão 00000000000!" }
+          notNull: { msg: "A CNH do motorista deve ser preenchida!" },
+          notEmpty: { msg: "A CNH do motorista deve ser preenchida!" },
+          is: { args: ["[0-9]{11}"], msg: "A CNH do motorista deve seguir o padrão 00000000000!" }
         }
       },
-
       nota: {
         type: DataTypes.FLOAT,
         defaultValue: 0
       }
-
     }, { sequelize, modelName: 'Motorista', tableName: 'motoristas' })
   }
 

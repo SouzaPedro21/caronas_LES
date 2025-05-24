@@ -1,34 +1,40 @@
 import { Model, DataTypes } from 'sequelize';
 //HELIO BREDA NETTO
 class Cidade extends Model {
-
   static init(sequelize) {
     super.init({
       nomeCidade: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
-          notEmpty: { msg: "Nome da Cidade deve ser preenchido!" },
-          len: { args: [2, 50], msg: "Nome da Cidade deve ter entre 2 e 50 letras!" }
+          notNull: { msg: "O nome da cidade deve ser preenchido!" },
+          notEmpty: { msg: "O nome da cidade deve ser preenchido!" },
+          len: { args: [2, 50], msg: "O nome da cidade deve ter entre 2 e 50 letras!" }
         }
       },
       uf: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
-          notEmpty: { msg: "a UF deve ser preenchida" },
-          len: { args: [2, 50], msg: "A UF deve seguir o padrão (XX)" }
+          notNull: { msg: "A UF deve ser preenchida!" },
+          notEmpty: { msg: "A UF deve ser preenchida!" },
+          len: { args: [2, 2], msg: "A UF deve seguir o padrão XX (2 letras)!" },
+          isUppercase: { msg: "A UF deve estar em maiúsculas!" }
         }
       },
       codigo: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
-          notEmpty: { msg: "O codigo deve ser preenchida" },
-          len: { args: [2, 50], msg: "Codigo deve ter o padrão (xxxxxxx)" }
+          notNull: { msg: "O código deve ser preenchido!" },
+          notEmpty: { msg: "O código deve ser preenchido!" },
+          len: { args: [7, 7], msg: "O código deve ter exatamente 7 caracteres!" },
+          isNumeric: { msg: "O código deve conter apenas números!" }
         }
-      },
-
-
+      }
     }, { sequelize, modelName: 'Cidade', tableName: 'cidades' })
   }
+
   static associate(models) {
     //this.hasMany(models.oferecimentoCarona, { as: 'oferecimentoCarona', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
   }

@@ -4,7 +4,6 @@ import { Op } from "sequelize";
 import sequelize from "../config/database-connection.js";
 
 class OferecimentoCaronaService {
-
   static async findAll() {
     const objs = await OferecimentoCarona.findAll({ include: { all: true, nested: true } });
     return objs;
@@ -18,16 +17,79 @@ class OferecimentoCaronaService {
 
   static async create(req) {
     let { data, previsaoTermino, vagas, preco, veiculoId, origemId, destinoId } = req.body;
-    vagas = Number(vagas);
-    if (isNaN(vagas) || vagas < 1 || vagas > 4) {
-      throw "A quantidade de vagas deve ser entre 1 e 4!";
+    const errors = [];
+
+    // Validação da data
+    if (!data) {
+      errors.push('A data da carona deve ser preenchida!');
+    } else {
+      const dataCarona = new Date(data);
+      if (isNaN(dataCarona.getTime())) {
+        errors.push('A data da carona deve ser uma data válida!');
+      } else if (dataCarona < new Date()) {
+        errors.push('A data da carona não pode ser no passado!');
+      }
     }
+
+    // Validação da previsão de término
+    if (!previsaoTermino) {
+      errors.push('A previsão de término da carona deve ser preenchida!');
+    } else {      const dataTermino = new Date(previsaoTermino);
+      if (isNaN(dataTermino.getTime())) {
+        errors.push('A previsão de término deve ser uma data válida!');
+      }
+    }
+
+    // Validação das vagas
+    if (!vagas) {
+      errors.push('O número de vagas deve ser preenchido!');
+    } else {
+      vagas = Number(vagas);
+      if (isNaN(vagas)) {
+        errors.push('O número de vagas deve ser um número!');
+      } else if (vagas < 1 || vagas > 4) {
+        errors.push('A quantidade de vagas deve ser entre 1 e 4!');
+      }
+    }
+
+    // Validação do preço
+    if (!preco) {
+      errors.push('O preço da carona deve ser preenchido!');
+    } else {
+      preco = Number(preco);
+      if (isNaN(preco)) {
+        errors.push('O preço deve ser um número!');
+      } else if (preco < 0) {
+        errors.push('O preço não pode ser negativo!');
+      }
+    }
+
+    // Validação do veículo
+    if (!veiculoId) {
+      errors.push('O veículo deve ser selecionado!');
+    }
+
+    // Validação da origem
+    if (!origemId) {
+      errors.push('A cidade de origem deve ser selecionada!');
+    }    // Validação do destino
+    if (!destinoId) {
+      errors.push('A cidade de destino deve ser selecionada!');
+    }
+
+    // Se houver erros de validação, retorna todos eles
+    if (errors.length > 0) {
+      throw errors.join('\n');
+    }
+
+    // Busca o veículo para obter o motorista
     const veiculo = await Veiculo.findByPk(veiculoId);
     if (!veiculo) throw "Veículo não encontrado!";
     const motoristaId = veiculo.motoristaId;
     req.body.motorista = { id: motoristaId };
 
-    await this.verificarRegrasDeNegocio(req); // Não precisa de if, pois lança erro se inválido
+    // Verifica as regras de negócio
+    await this.verificarRegrasDeNegocio(req);
 
     const t = await sequelize.transaction();
     try {
@@ -39,7 +101,7 @@ class OferecimentoCaronaService {
       return await OferecimentoCarona.findByPk(obj.id, { include: { all: true, nested: true } });
     } catch (error) {
       await t.rollback();
-      console.error(error); // Veja o erro real no console
+      console.error(error);
       throw "Erro ao criar o oferecimento de carona!";
     }
   }
@@ -48,6 +110,7 @@ class OferecimentoCaronaService {
     const { id } = req.params;
     const { data, previsaoTermino, vagas, preco, veiculoId, origemId, destinoId } = req.body;
     const obj = await OferecimentoCarona.findByPk(id, { include: { all: true, nested: true } });
+    if (obj == null) throw 'Oferecimento de carona não encontrado!';
     Object.assign(obj, { data, previsaoTermino, vagas, preco, veiculoId, origemId, destinoId });
     await obj.save();
     return await OferecimentoCarona.findByPk(obj.id, { include: { all: true, nested: true } });
@@ -56,40 +119,45 @@ class OferecimentoCaronaService {
   static async delete(req) {
     const { id } = req.params;
     const obj = await OferecimentoCarona.findByPk(id);
+    if (obj == null)
+      throw 'Oferecimento de carona não encontrado!';
     await obj.destroy();
     return obj;
   }
-
   static async verificarRegrasDeNegocio(req) {
     const { data, previsaoTermino, motorista } = req.body;
+    const dataCarona = new Date(data);
 
-    // Regra 1: O Motorista não pode oferecer uma Carona até que a anterior seja finalizada
-    // Busca caronas do motorista que ainda não foram finalizadas (previsaoTermino > agora)
+    // Regra 1: O Motorista não pode oferecer mais que quatro Caronas no mesmo dia
+    const dataSomenteDia = dataCarona.toISOString().slice(0, 10);
+    const totalCaronasDia = await OferecimentoCarona.count({
+      where: {
+        motoristaId: motorista.id,
+        data: {
+          [Op.gte]: new Date(dataSomenteDia + "T00:00:00.000Z"),
+          [Op.lt]: new Date(dataSomenteDia + "T23:59:59.999Z")
+        }
+      }
+    });
+
+    if (totalCaronasDia >= 4) {
+      throw "O motorista não pode oferecer mais que quatro caronas no mesmo dia!";
+    }
+
+    // Regra 2: O Motorista não pode oferecer uma Carona até que a anterior seja finalizada
+    const agora = new Date();
     const caronasEmAberto = await OferecimentoCarona.findAll({
       where: {
         motoristaId: motorista.id,
-        previsaoTermino: { [Op.gt]: new Date() }
+        data: { [Op.lt]: agora },
+        previsaoTermino: { [Op.gt]: agora }
       }
     });
 
     if (caronasEmAberto.length > 0) {
       throw "O motorista possui uma carona em andamento e não pode oferecer outra até finalizá-la!";
     }
-    // Regra 2: O Motorista não pode oferecer mais que quatro Caronas no mesmo dia
-    // Considera todas as caronas do motorista com a mesma data (ignorando hora)
-    const dataSomenteDia = new Date(data).toISOString().slice(0, 10); // "YYYY-MM-DD"
-    const totalCaronasDia = await OferecimentoCarona.count({
-      where: {
-        motoristaId: motorista.id,
-        data: {
-          [Op.gte]: new Date(dataSomenteDia + "T00:00:00"),
-          [Op.lt]: new Date(dataSomenteDia + "T23:59:59")
-        }
-      }
-    });
-    if (totalCaronasDia >= 4) {
-      throw "O motorista não pode oferecer mais que quatro caronas no mesmo dia!";
-    }
+
     return true;
   }
 }
