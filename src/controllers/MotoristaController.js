@@ -2,35 +2,47 @@ import { MotoristaService } from "../services/MotoristaService.js";
 //PEDRO HENRIQUE BRAIDO DE SOUZA
 
 class MotoristaController {
-  
+
   static async findAll(req, res, next) {
     MotoristaService.findAll()
-        .then(objs => res.json(objs))
-        .catch(next);
+      .then(objs => res.json(objs))
+      .catch(next);
   }
 
   static async findByPk(req, res, next) {
     MotoristaService.findByPk(req)
-        .then(obj => res.json(obj))
-        .catch(next);
+      .then(obj => res.json(obj))
+      .catch(next);
   }
 
   static async create(req, res, next) {
     MotoristaService.create(req)
-        .then(obj => res.json(obj))
-        .catch(next);
+      .then(obj => res.json(obj))
+      .catch(next);
   }
 
   static async update(req, res, next) {
     MotoristaService.update(req)
-        .then(obj => res.json(obj))
-        .catch(next);
+      .then(obj => res.json(obj))
+      .catch(next);
   }
 
   static async delete(req, res, next) {
     MotoristaService.delete(req)
-        .then(obj => res.json(obj))
-        .catch(next);
+      .then(obj => res.json(obj))
+      .catch(next);
+  }
+
+  static async getRelatorioCaronasAceitas(req, res, next) {
+    MotoristaService.getRelatorioCaronasAceitas(req)
+      .then(relatorio => res.json(relatorio))
+      .catch(next);
+  }
+
+  static async getRelatorioValorCaronasAceitas(req, res, next) {
+    MotoristaService.getRelatorioValorCaronasAceitas(req)
+      .then(relatorio => res.json(relatorio))
+      .catch(next);
   }
 
 }

@@ -2,6 +2,7 @@ import { OferecimentoCarona } from "../models/OferecimentoCarona.js";
 import { Veiculo } from "../models/Veiculo.js";
 import { Op } from "sequelize";
 import sequelize from "../config/database-connection.js";
+import { QueryTypes } from "sequelize";
 //HELIO BREDA NETTO
 
 class OferecimentoCaronaService {
@@ -35,7 +36,8 @@ class OferecimentoCaronaService {
     // Validação da previsão de término
     if (!previsaoTermino) {
       errors.push('A previsão de término da carona deve ser preenchida!');
-    } else {      const dataTermino = new Date(previsaoTermino);
+    } else {
+      const dataTermino = new Date(previsaoTermino);
       if (isNaN(dataTermino.getTime())) {
         errors.push('A previsão de término deve ser uma data válida!');
       }
@@ -125,6 +127,40 @@ class OferecimentoCaronaService {
     await obj.destroy();
     return obj;
   }
+
+  static async getRelatorioCaronasOfertadas(req) {
+    const { data, origemId, destinoId } = req.query;
+
+    const query = `
+      SELECT 
+        oc.id as carona_id,
+        m.nome as motorista,
+        oc.data as horario_saida,
+        oc.preco as valor,
+        co.nome_cidade as origem,
+        cd.nome_cidade as destino
+      FROM oferecimentoCarona oc
+      INNER JOIN motoristas m ON m.id = oc.motorista_id
+      INNER JOIN cidades co ON co.id = oc.origem_id
+      INNER JOIN cidades cd ON cd.id = oc.destino_id
+      WHERE DATE(oc.data) = DATE(:data)
+      ${origemId ? 'AND oc.origem_id = :origemId' : ''}
+      ${destinoId ? 'AND oc.destino_id = :destinoId' : ''}
+      AND oc.vagas > 0
+      ORDER BY oc.data ASC`;
+
+    const relatorio = await sequelize.query(query, {
+      replacements: {
+        data: new Date(data),
+        origemId,
+        destinoId
+      },
+      type: QueryTypes.SELECT
+    });
+
+    return relatorio;
+  }
+
   static async verificarRegrasDeNegocio(req) {
     const { data, previsaoTermino, motorista } = req.body;
     const dataCarona = new Date(data);

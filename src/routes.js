@@ -15,6 +15,7 @@ routes.get('/cidades/:id', CidadeController.findByPk);
 routes.post('/cidades', CidadeController.create);
 routes.put('/cidades/:id', CidadeController.update);
 routes.delete('/cidades/:id', CidadeController.delete);
+routes.get('/cidades/relatorioCaronasPorCidade/:id', CidadeController.getRelatorioCaronasPorCidade);
 
 routes.get('/clientes', ClienteController.findAll);
 routes.get('/clientes/:id', ClienteController.findByPk);
@@ -28,17 +29,20 @@ routes.post('/veiculos', VeiculoController.create);
 routes.put('/veiculos/:id', VeiculoController.update);
 routes.delete('/veiculos/:id', VeiculoController.delete);
 
+routes.get('/motoristas/relatorioValorCaronasAceitas', MotoristaController.getRelatorioValorCaronasAceitas);
 routes.get('/motoristas', MotoristaController.findAll);
 routes.get('/motoristas/:id', MotoristaController.findByPk);
 routes.post('/motoristas', MotoristaController.create);
 routes.put('/motoristas/:id', MotoristaController.update);
 routes.delete('/motoristas/:id', MotoristaController.delete);
+routes.get('/motoristas/relatorioCaronasAceitas/:id', MotoristaController.getRelatorioCaronasAceitas);
 
 routes.get('/oferecimentoCarona', OferecimentoCaronaController.findAll);
 routes.get('/oferecimentoCarona/:id', OferecimentoCaronaController.findByPk);
 routes.post('/oferecimentoCarona', OferecimentoCaronaController.create);
 routes.put('/oferecimentoCarona/:id', OferecimentoCaronaController.update);
 routes.delete('/oferecimentoCarona/:id', OferecimentoCaronaController.delete);
+routes.get('/oferecimentoCarona/relatorioCaronasOfertadas', OferecimentoCaronaController.getRelatorioCaronasOfertadas);
 
 routes.get('/aceiteCarona', AceiteCaronaController.findAll);
 routes.get('/aceiteCarona/:id', AceiteCaronaController.findByPk);

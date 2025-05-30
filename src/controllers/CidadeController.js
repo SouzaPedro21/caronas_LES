@@ -39,6 +39,12 @@ class CidadeController {
         .catch(next);
   }
 
+  static async getRelatorioCaronasPorCidade(req, res, next) {
+    CidadeService.getRelatorioCaronasPorCidade(req)
+        .then(obj => res.json(obj))
+        .catch(next);
+  }
+
 }
 
 export { CidadeController };

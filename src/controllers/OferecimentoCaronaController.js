@@ -33,6 +33,12 @@ class OferecimentoCaronaController {
         .catch(next);
   }
 
+  static async getRelatorioCaronasOfertadas(req, res, next) {
+    OferecimentoCaronaService.getRelatorioCaronasOfertadas(req)
+        .then(relatorio => res.json(relatorio))
+        .catch(next);
+  }
+
 }
 
 export { OferecimentoCaronaController };
