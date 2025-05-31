@@ -326,6 +326,84 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "relatorio_aceites_por_motorista_por_periodo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/motoristas/relatorioCaronasAceitas/:id?dataInicio=2025-01-01&dataFim=2025-12-31",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas",
+						"relatorioCaronasAceitas",
+						":id"
+					],
+					"query": [
+						{
+							"key": "dataInicio",
+							"value": "2025-01-01"
+						},
+						{
+							"key": "dataFim",
+							"value": "2025-12-31"
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "relatorio_montante_por_motorista_por_periodo",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"veiculoId\": \"1\",\r\n    \"data\": \"2023-10-10T10:10:00.000Z\",\r\n    \"previsaoTermino\": \"2023-10-10T11:40:00\",\r\n    \"vagas\": \"4\",\r\n    \"preco\": \"10.0\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3333/motoristas/relatorioValorCaronasAceitas?dataInicio=2025-01-01&dataFim=2025-12-31&MotoristaId=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"motoristas",
+						"relatorioValorCaronasAceitas"
+					],
+					"query": [
+						{
+							"key": "dataInicio",
+							"value": "2025-01-01"
+						},
+						{
+							"key": "dataFim",
+							"value": "2025-12-31"
+						},
+						{
+							"key": "MotoristaId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

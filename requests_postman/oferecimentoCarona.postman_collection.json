@@ -239,6 +239,47 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "relatorio_oferecimentos_por_origem_destino_e_data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/oferecimentoCarona/relatorioCaronasOfertadas/:id?data=2025-10-01&origemId=1&DestinoId=2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"oferecimentoCarona",
+						"relatorioCaronasOfertadas",
+						":id"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "2025-10-01"
+						},
+						{
+							"key": "origemId",
+							"value": "1"
+						},
+						{
+							"key": "DestinoId",
+							"value": "2"
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

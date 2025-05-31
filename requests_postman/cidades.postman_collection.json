@@ -323,6 +323,43 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "relatorio_aceites_por_cidade_por_periodo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/cidades/relatorioCaronasPorCidade/:id?dataInicio=2025-01-01&dataFim=2025-12-31",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"cidades",
+						"relatorioCaronasPorCidade",
+						":id"
+					],
+					"query": [
+						{
+							"key": "dataInicio",
+							"value": "2025-01-01"
+						},
+						{
+							"key": "dataFim",
+							"value": "2025-12-31"
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
