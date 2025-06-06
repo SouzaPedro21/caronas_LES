@@ -30,8 +30,8 @@ databaseInserts(); // comentar quando estiver em ambiente de produção (não cr
 function databaseInserts() {
     (async () => {
 
-        await sequelize.sync({ force: true });
-
+        await sequelize.sync();
+/*
         await Cidade.create({ nomeCidade: "Alegre", uf: "ES", codigo: "3200201" });
         await Cidade.create({ nomeCidade: "Cachoeiro de Itapemirim", uf: "ES", codigo: "3201209" });
         await Cidade.create({ nomeCidade: "Castelo", uf: "ES", codigo: "3201407" });
@@ -75,7 +75,7 @@ function databaseInserts() {
         await AceiteCarona.create({ clienteId: 2, oferecimentoCaronaId: 5 });
         await AceiteCarona.create({ clienteId: 2, oferecimentoCaronaId: 6 });
         await AceiteCarona.create({ clienteId: 2, oferecimentoCaronaId: 7 });
-
+*/
     })();
 }
 
