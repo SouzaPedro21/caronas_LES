@@ -9,6 +9,21 @@ import { AceiteCaronaController } from './controllers/AceiteCaronaController.js'
 
 const routes = express.Router();
 
+// Rota raiz para evitar erro "Cannot GET /"
+routes.get('/', (req, res) => {
+    res.json({ 
+        message: 'API Caronas LES está funcionando!',
+        version: '1.0.0',
+        endpoints: [
+            'GET /cidades',
+            'GET /clientes', 
+            'GET /veiculos',
+            'GET /motoristas',
+            'GET /oferecimentoCarona',
+            'GET /aceiteCarona'
+        ]
+    });
+});
 
 routes.get('/cidades', CidadeController.findAll);
 routes.get('/cidades/:id', CidadeController.findByPk);
