@@ -1,95 +1,196 @@
 import React, { useEffect, useState } from 'react';
 
-type Cliente = { id: number; nome: string };
-type Carona = { id: number; data: string; origem: { nomeCidade: string }; destino: { nomeCidade: string } };
-
-const initialState = {
-  clienteId: '',
-  oferecimentoCaronaId: '',
+type Carona = {
+  id: number;
+  data: string;
+  previsaoTermino: string;
+  vagas: number;
+  preco: number;
+  origem: { nomeCidade: string };
+  destino: { nomeCidade: string };
+  veiculo: { placa: string; marca: string; modelo: string };
+  motorista: { nome: string };
 };
 
-type Aceite = typeof initialState;
+type Cliente = {
+  id: number;
+  nome: string;
+};
 
 const AceiteCaronaForm: React.FC = () => {
-  const [form, setForm] = useState<Aceite>(initialState);
-  const [mensagem, setMensagem] = useState<string>('');
-  const [erros, setErros] = useState<Partial<Aceite>>({});
-  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [caronas, setCaronas] = useState<Carona[]>([]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [clienteSelecionado, setClienteSelecionado] = useState<string>('');
+  const [mensagem, setMensagem] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://localhost:3000/clientes').then(res => res.json()).then(setClientes);
-    fetch('http://localhost:3000/oferecimentoCarona').then(res => res.json()).then(setCaronas);
+    const buscarDados = async () => {
+      try {
+        const [caronasRes, clientesRes] = await Promise.all([
+          fetch('http://localhost:3333/oferecimentoCarona'),
+          fetch('http://localhost:3333/clientes')
+        ]);
+        
+        const caronasData = await caronasRes.json();
+        const clientesData = await clientesRes.json();
+        
+        setCaronas(caronasData);
+        setClientes(clientesData);
+      } catch (error) {
+        setMensagem('Erro ao carregar dados');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    buscarDados();
   }, []);
 
-  const validar = (): boolean => {
-    const novosErros: Partial<Aceite> = {};
-    if (!form.clienteId) {
-      novosErros.clienteId = 'Selecione um cliente';
+  const handleAceitarCarona = async (caronaId: number) => {
+    if (!clienteSelecionado) {
+      setMensagem('Selecione um cliente primeiro');
+      return;
     }
-    if (!form.oferecimentoCaronaId) {
-      novosErros.oferecimentoCaronaId = 'Selecione uma carona';
-    }
-    setErros(novosErros);
-    return Object.keys(novosErros).length === 0;
-  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMensagem('');
-    if (!validar()) return;
     try {
-      const resp = await fetch('http://localhost:3000/aceiteCarona', {
+      const response = await fetch('http://localhost:3333/aceiteCarona', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          clienteId: Number(form.clienteId),
-          oferecimentoCaronaId: Number(form.oferecimentoCaronaId),
+          clienteId: Number(clienteSelecionado),
+          oferecimentoCaronaId: caronaId,
         }),
       });
-      if (resp.ok) {
+
+      if (response.ok) {
         setMensagem('Carona aceita com sucesso!');
-        setForm(initialState);
+        // Atualizar a lista de caronas (opcional)
+        // Aqui você pode remover a carona da lista ou decrementar as vagas
       } else {
-        const data = await resp.json();
-        setMensagem(data.message || 'Erro ao aceitar carona.');
+        const data = await response.json();
+        setMensagem(data.message || 'Erro ao aceitar carona');
       }
-    } catch (err) {
-      setMensagem('Erro de conexão com o servidor.');
+    } catch (error) {
+      setMensagem('Erro de conexão com o servidor');
     }
   };
 
+  if (loading) {
+    return (
+      <div className="form-container">
+        <div className="card">
+          <div className="card-body text-center">
+            <div className="loading-spinner"></div>
+            <p>Carregando caronas disponíveis...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="card p-4">
-      <h2>Aceite de Carona</h2>
-      {mensagem && <div className="alert alert-info">{mensagem}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Cliente</label>
-          <select className={`form-select${erros.clienteId ? ' is-invalid' : ''}`} name="clienteId" value={form.clienteId} onChange={handleChange}>
-            <option value="">Selecione</option>
-            {clientes.map(c => (
-              <option key={c.id} value={c.id}>{c.nome}</option>
-            ))}
-          </select>
-          {erros.clienteId && <div className="invalid-feedback">{erros.clienteId}</div>}
+    <div className="form-container">
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">
+            <span className="icon-badge icon-badge-aceitar"></span>
+            Aceitar Carona
+          </h2>
         </div>
-        <div className="mb-3">
-          <label className="form-label">Carona</label>
-          <select className={`form-select${erros.oferecimentoCaronaId ? ' is-invalid' : ''}`} name="oferecimentoCaronaId" value={form.oferecimentoCaronaId} onChange={handleChange}>
-            <option value="">Selecione</option>
-            {caronas.map(c => (
-              <option key={c.id} value={c.id}>{`${c.origem?.nomeCidade || ''} → ${c.destino?.nomeCidade || ''} (${new Date(c.data).toLocaleString()})`}</option>
-            ))}
-          </select>
-          {erros.oferecimentoCaronaId && <div className="invalid-feedback">{erros.oferecimentoCaronaId}</div>}
+        <div className="card-body">
+          {mensagem && (
+            <div className={`alert ${mensagem.includes('sucesso') ? 'alert-success' : 'alert-danger'}`}>
+              {mensagem}
+            </div>
+          )}
+
+          {/* Seleção de Cliente */}
+          <div className="mb-4">
+            <label className="form-label">Selecione o Cliente</label>
+            <select 
+              className="form-control"
+              value={clienteSelecionado}
+              onChange={(e) => setClienteSelecionado(e.target.value)}
+            >
+              <option value="">Escolha um cliente...</option>
+              {clientes.map(cliente => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Lista de Caronas */}
+          {caronas.length === 0 ? (
+            <div className="alert alert-info">
+              Nenhuma carona disponível no momento.
+            </div>
+          ) : (
+            <div className="caronas-list">
+              <h4 className="mb-3">Caronas Disponíveis ({caronas.length})</h4>
+              {caronas.map((carona) => (
+                <div key={carona.id} className="card mb-3" style={{ border: '1px solid #dee2e6' }}>
+                  <div className="card-body">
+                    <div className="row align-items-center">
+                      <div className="col-md-8">
+                        <div className="carona-info">
+                          <h5 className="mb-2">
+                            <span className="icon-badge icon-badge-cidade"></span>
+                            {carona.origem?.nomeCidade || 'N/A'} → {carona.destino?.nomeCidade || 'N/A'}
+                          </h5>
+                          <div className="carona-details">
+                            <p className="mb-1">
+                              <strong>📅 Data:</strong> {new Date(carona.data).toLocaleString('pt-BR')}
+                            </p>
+                            <p className="mb-1">
+                              <strong>⏰ Término:</strong> {new Date(carona.previsaoTermino).toLocaleString('pt-BR')}
+                            </p>
+                            <p className="mb-1">
+                              <strong>🚗 Veículo:</strong> {carona.veiculo?.placa} - {carona.veiculo?.marca} {carona.veiculo?.modelo}
+                            </p>
+                            <p className="mb-1">
+                              <strong>👨‍💼 Motorista:</strong> {carona.motorista?.nome || 'N/A'}
+                            </p>
+                            <div className="row">
+                              <div className="col-sm-6">
+                                <p className="mb-1">
+                                  <strong>👥 Vagas:</strong> {carona.vagas}
+                                </p>
+                              </div>
+                              <div className="col-sm-6">
+                                <p className="mb-1">
+                                  <strong>💰 Preço:</strong> R$ {carona.preco?.toFixed(2)}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-4 text-center">
+                        <button
+                          className="btn btn-success btn-lg"
+                          onClick={() => handleAceitarCarona(carona.id)}
+                          disabled={!clienteSelecionado || carona.vagas === 0}
+                          style={{ minWidth: '140px' }}
+                        >
+                          {carona.vagas === 0 ? 'Lotada' : 'Aceitar Carona'}
+                        </button>
+                        {!clienteSelecionado && (
+                          <small className="text-muted d-block mt-2">
+                            Selecione um cliente primeiro
+                          </small>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <button type="submit" className="btn btn-primary">Aceitar Carona</button>
-      </form>
+      </div>
     </div>
   );
 };

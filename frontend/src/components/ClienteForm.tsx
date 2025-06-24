@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const initialState = {
   nome: '',
@@ -9,10 +9,11 @@ const initialState = {
 
 type Cliente = typeof initialState;
 
-const ClienteForm: React.FC = () => {
+const ClienteForm = () => {
   const [form, setForm] = useState<Cliente>(initialState);
   const [mensagem, setMensagem] = useState<string>('');
   const [erros, setErros] = useState<Partial<Cliente>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const validar = (): boolean => {
     const novosErros: Partial<Cliente> = {};
@@ -34,12 +35,18 @@ const ClienteForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    // Limpar erro específico quando o usuário começar a digitar
+    if (erros[e.target.name as keyof Cliente]) {
+      setErros({ ...erros, [e.target.name]: undefined });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensagem('');
     if (!validar()) return;
+    
+    setIsLoading(true);
     try {
       const resp = await fetch('http://localhost:3333/clientes', {
         method: 'POST',
@@ -49,46 +56,115 @@ const ClienteForm: React.FC = () => {
       if (resp.ok) {
         setMensagem('Cliente cadastrado com sucesso!');
         setForm(initialState);
+        setErros({});
       } else {
         const data = await resp.json();
         setMensagem(data.message || 'Erro ao cadastrar cliente.');
       }
     } catch (err) {
-      setMensagem('Erro de conexão com o servidor.');
+      setMensagem('Erro de conexão com o servidor.');    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="card p-4">
-      <h2>Cadastro de Cliente</h2>
-      {mensagem && <div className="alert alert-info">{mensagem}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Nome</label>
-          <input type="text" className={`form-control${erros.nome ? ' is-invalid' : ''}`} name="nome" value={form.nome} onChange={handleChange} />
-          {erros.nome && <div className="invalid-feedback">{erros.nome}</div>}
+    <div className="form-container">
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">
+            <span className="icon-badge icon-badge-pessoa">👤</span> Cadastro de Cliente
+          </h2>
         </div>
-        <div className="mb-3">
-          <label className="form-label">CPF</label>
-          <input type="text" className={`form-control${erros.cpf ? ' is-invalid' : ''}`} name="cpf" value={form.cpf} onChange={handleChange} placeholder="000.000.000-00" />
-          {erros.cpf && <div className="invalid-feedback">{erros.cpf}</div>}
+        <div className="card-body">
+          {mensagem && (
+            <div className={`alert ${mensagem.includes('sucesso') ? 'alert-success' : 'alert-danger'}`}>
+              {mensagem}
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit} className="form">
+            <div className="form-grid">
+              <div className="form-group full-width">
+                <label className="form-label">Nome Completo</label>
+                <input 
+                  type="text" 
+                  name="nome" 
+                  value={form.nome} 
+                  onChange={handleChange}
+                  placeholder="Digite o nome completo"
+                  className={`form-control${erros.nome ? ' is-invalid' : ''}`}
+                />
+                {erros.nome && <div className="invalid-feedback">{erros.nome}</div>}
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">CPF</label>
+                <input 
+                  type="text" 
+                  name="cpf" 
+                  value={form.cpf} 
+                  onChange={handleChange}
+                  placeholder="000.000.000-00"
+                  className={`form-control${erros.cpf ? ' is-invalid' : ''}`}
+                />
+                {erros.cpf && <div className="invalid-feedback">{erros.cpf}</div>}
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Sexo</label>
+                <select 
+                  name="sexo" 
+                  value={form.sexo} 
+                  onChange={handleChange}
+                  className={`form-control${erros.sexo ? ' is-invalid' : ''}`}
+                >
+                  <option value="">Selecione</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Feminino</option>
+                </select>
+                {erros.sexo && <div className="invalid-feedback">{erros.sexo}</div>}
+              </div>
+              
+              <div className="form-group full-width">
+                <label className="form-label">Telefone</label>
+                <input 
+                  type="text" 
+                  name="telefone" 
+                  value={form.telefone} 
+                  onChange={handleChange}
+                  placeholder="99 99999-9999"
+                  className={`form-control${erros.telefone ? ' is-invalid' : ''}`}
+                />
+                {erros.telefone && <div className="invalid-feedback">{erros.telefone}</div>}
+              </div>
+            </div>
+            
+            <div className="d-flex justify-content-center gap-3 mt-4">
+              <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <span className="loading-spinner"></span>
+                    Cadastrando...
+                  </>
+                ) : (
+                  'Cadastrar Cliente'
+                )}
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-secondary"
+                onClick={() => {
+                  setForm(initialState);
+                  setErros({});
+                  setMensagem('');
+                }}
+              >
+                Limpar Formulário
+              </button>
+            </div>
+          </form>
         </div>
-        <div className="mb-3">
-          <label className="form-label">Sexo</label>
-          <select className={`form-select${erros.sexo ? ' is-invalid' : ''}`} name="sexo" value={form.sexo} onChange={handleChange}>
-            <option value="">Selecione</option>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-          </select>
-          {erros.sexo && <div className="invalid-feedback">{erros.sexo}</div>}
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Telefone</label>
-          <input type="text" className={`form-control${erros.telefone ? ' is-invalid' : ''}`} name="telefone" value={form.telefone} onChange={handleChange} placeholder="99 99999-9999" />
-          {erros.telefone && <div className="invalid-feedback">{erros.telefone}</div>}
-        </div>
-        <button type="submit" className="btn btn-primary">Cadastrar</button>
-      </form>
+      </div>
     </div>
   );
 };

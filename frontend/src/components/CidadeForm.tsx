@@ -37,7 +37,7 @@ const CidadeForm: React.FC = () => {
     setMensagem('');
     if (!validar()) return;
     try {
-      const resp = await fetch('http://localhost:3000/cidades', {
+      const resp = await fetch('http://localhost:3333/cidades', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -53,29 +53,67 @@ const CidadeForm: React.FC = () => {
       setMensagem('Erro de conexão com o servidor.');
     }
   };
-
   return (
-    <div className="card p-4">
-      <h2>Cadastro de Cidade</h2>
-      {mensagem && <div className="alert alert-info">{mensagem}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Nome da Cidade</label>
-          <input type="text" className={`form-control${erros.nomeCidade ? ' is-invalid' : ''}`} name="nomeCidade" value={form.nomeCidade} onChange={handleChange} />
-          {erros.nomeCidade && <div className="invalid-feedback">{erros.nomeCidade}</div>}
+    <div className="form-container">
+      <div className="card">        <div className="card-header">
+          <h2 className="card-title">📍 Cadastro de Cidade</h2>
         </div>
-        <div className="mb-3">
-          <label className="form-label">UF</label>
-          <input type="text" className={`form-control${erros.uf ? ' is-invalid' : ''}`} name="uf" value={form.uf} onChange={handleChange} placeholder="EX: SP" maxLength={2} />
-          {erros.uf && <div className="invalid-feedback">{erros.uf}</div>}
+        <div className="card-body">
+          {mensagem && (
+            <div className={`alert ${mensagem.includes('sucesso') ? 'alert-success' : 'alert-danger'}`}>
+              {mensagem}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="form">
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">Nome da Cidade</label>
+                <input 
+                  type="text" 
+                  className={`form-control${erros.nomeCidade ? ' is-invalid' : ''}`} 
+                  name="nomeCidade" 
+                  value={form.nomeCidade} 
+                  onChange={handleChange}
+                  placeholder="Digite o nome da cidade"
+                />
+                {erros.nomeCidade && <div className="invalid-feedback">{erros.nomeCidade}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">UF</label>
+                <input 
+                  type="text" 
+                  className={`form-control${erros.uf ? ' is-invalid' : ''}`} 
+                  name="uf" 
+                  value={form.uf} 
+                  onChange={handleChange} 
+                  placeholder="Ex: SP" 
+                  maxLength={2}
+                  style={{ textTransform: 'uppercase' }}
+                />
+                {erros.uf && <div className="invalid-feedback">{erros.uf}</div>}
+              </div>
+              <div className="form-group full-width">
+                <label className="form-label">Código</label>
+                <input 
+                  type="text" 
+                  className={`form-control${erros.codigo ? ' is-invalid' : ''}`} 
+                  name="codigo" 
+                  value={form.codigo} 
+                  onChange={handleChange} 
+                  placeholder="7 dígitos numéricos" 
+                  maxLength={7}
+                />
+                {erros.codigo && <div className="invalid-feedback">{erros.codigo}</div>}
+              </div>
+            </div>
+            <div className="d-flex justify-content-center mt-4">
+              <button type="submit" className="btn btn-primary">
+                Cadastrar Cidade
+              </button>
+            </div>
+          </form>
         </div>
-        <div className="mb-3">
-          <label className="form-label">Código</label>
-          <input type="text" className={`form-control${erros.codigo ? ' is-invalid' : ''}`} name="codigo" value={form.codigo} onChange={handleChange} placeholder="Somente números" maxLength={7} />
-          {erros.codigo && <div className="invalid-feedback">{erros.codigo}</div>}
-        </div>
-        <button type="submit" className="btn btn-primary">Cadastrar</button>
-      </form>
+      </div>
     </div>
   );
 };

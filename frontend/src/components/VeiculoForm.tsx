@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 type Motorista = {
   id: number;
   nome: string;
+  cnh: string;
 };
 
 const initialState = {
@@ -22,7 +23,7 @@ const VeiculoForm: React.FC = () => {
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/motoristas')
+    fetch('http://localhost:3333/motoristas')
       .then(res => res.json())
       .then(data => setMotoristas(data));
   }, []);
@@ -57,7 +58,7 @@ const VeiculoForm: React.FC = () => {
     setMensagem('');
     if (!validar()) return;
     try {
-      const resp = await fetch('http://localhost:3000/veiculos', {
+      const resp = await fetch('http://localhost:3333/veiculos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, motoristaId: Number(form.motoristaId) }),
@@ -73,44 +74,92 @@ const VeiculoForm: React.FC = () => {
       setMensagem('Erro de conexão com o servidor.');
     }
   };
-
   return (
-    <div className="card p-4">
-      <h2>Cadastro de Veículo</h2>
-      {mensagem && <div className="alert alert-info">{mensagem}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Placa</label>
-          <input type="text" className={`form-control${erros.placa ? ' is-invalid' : ''}`} name="placa" value={form.placa} onChange={handleChange} placeholder="AAA-9A99" />
-          {erros.placa && <div className="invalid-feedback">{erros.placa}</div>}
+    <div className="form-container">
+      <div className="card">        <div className="card-header">
+          <h2 className="card-title">� Cadastro de Veículo</h2>
         </div>
-        <div className="mb-3">
-          <label className="form-label">Marca</label>
-          <input type="text" className={`form-control${erros.marca ? ' is-invalid' : ''}`} name="marca" value={form.marca} onChange={handleChange} />
-          {erros.marca && <div className="invalid-feedback">{erros.marca}</div>}
+        <div className="card-body">
+          {mensagem && (
+            <div className={`alert ${mensagem.includes('sucesso') ? 'alert-success' : 'alert-danger'}`}>
+              {mensagem}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="form">
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">Placa</label>
+                <input 
+                  type="text" 
+                  className={`form-control${erros.placa ? ' is-invalid' : ''}`} 
+                  name="placa" 
+                  value={form.placa} 
+                  onChange={handleChange} 
+                  placeholder="AAA-9A99"
+                  style={{ textTransform: 'uppercase' }}
+                />
+                {erros.placa && <div className="invalid-feedback">{erros.placa}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">Marca</label>
+                <input 
+                  type="text" 
+                  className={`form-control${erros.marca ? ' is-invalid' : ''}`} 
+                  name="marca" 
+                  value={form.marca} 
+                  onChange={handleChange}
+                  placeholder="Ex: Toyota"
+                />
+                {erros.marca && <div className="invalid-feedback">{erros.marca}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">Modelo</label>
+                <input 
+                  type="text" 
+                  className={`form-control${erros.modelo ? ' is-invalid' : ''}`} 
+                  name="modelo" 
+                  value={form.modelo} 
+                  onChange={handleChange}
+                  placeholder="Ex: Corolla"
+                />
+                {erros.modelo && <div className="invalid-feedback">{erros.modelo}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">Chassi</label>
+                <input 
+                  type="text" 
+                  className={`form-control${erros.chassi ? ' is-invalid' : ''}`} 
+                  name="chassi" 
+                  value={form.chassi} 
+                  onChange={handleChange}
+                  placeholder="Número do chassi"
+                />
+                {erros.chassi && <div className="invalid-feedback">{erros.chassi}</div>}
+              </div>
+              <div className="form-group full-width">
+                <label className="form-label">Motorista</label>
+                <select 
+                  className={`form-control${erros.motoristaId ? ' is-invalid' : ''}`} 
+                  name="motoristaId" 
+                  value={form.motoristaId} 
+                  onChange={handleChange}
+                >
+                  <option value="">Selecione um motorista</option>
+                  {motoristas.map(m => (
+                    <option key={m.id} value={m.id}>{m.nome} (CNH: {m.cnh})</option>
+                  ))}
+                </select>
+                {erros.motoristaId && <div className="invalid-feedback">{erros.motoristaId}</div>}
+              </div>
+            </div>
+            <div className="d-flex justify-content-center mt-4">
+              <button type="submit" className="btn btn-primary">
+                Cadastrar Veículo
+              </button>
+            </div>
+          </form>
         </div>
-        <div className="mb-3">
-          <label className="form-label">Modelo</label>
-          <input type="text" className={`form-control${erros.modelo ? ' is-invalid' : ''}`} name="modelo" value={form.modelo} onChange={handleChange} />
-          {erros.modelo && <div className="invalid-feedback">{erros.modelo}</div>}
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Chassi</label>
-          <input type="text" className={`form-control${erros.chassi ? ' is-invalid' : ''}`} name="chassi" value={form.chassi} onChange={handleChange} />
-          {erros.chassi && <div className="invalid-feedback">{erros.chassi}</div>}
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Motorista</label>
-          <select className={`form-select${erros.motoristaId ? ' is-invalid' : ''}`} name="motoristaId" value={form.motoristaId} onChange={handleChange}>
-            <option value="">Selecione</option>
-            {motoristas.map(m => (
-              <option key={m.id} value={m.id}>{m.nome}</option>
-            ))}
-          </select>
-          {erros.motoristaId && <div className="invalid-feedback">{erros.motoristaId}</div>}
-        </div>
-        <button type="submit" className="btn btn-primary">Cadastrar</button>
-      </form>
+      </div>
     </div>
   );
 };
