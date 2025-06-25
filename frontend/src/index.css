@@ -675,6 +675,16 @@ p {
   background-color: var(--gray-600);
 }
 
+.badge-black {
+  color: var(--white);
+  background-color: #000000;
+}
+
+.badge-lg {
+  padding: 0.5em 0.75em;
+  font-size: 0.875rem;
+}
+
 /* Estilos para detalhes/summary */
 details {
   border: 1px solid var(--gray-200);

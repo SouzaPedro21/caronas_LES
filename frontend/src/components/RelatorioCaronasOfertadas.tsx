@@ -15,6 +15,8 @@ type RelatorioCaronasOfertadas = {
 };
 
 const RelatorioCaronasOfertadas: React.FC = () => {
+  console.log('🎯 COMPONENTE RelatorioCaronasOfertadas CARREGADO');
+  
   const [loading, setLoading] = useState<boolean>(false);
   const [erro, setErro] = useState<string>('');
   const [dataEspecifica, setDataEspecifica] = useState<string>('');
@@ -24,12 +26,16 @@ const RelatorioCaronasOfertadas: React.FC = () => {
   const [relatorioOfertadas, setRelatorioOfertadas] = useState<RelatorioCaronasOfertadas[]>([]);
 
   useEffect(() => {
+    console.log('📡 useEffect executado - buscando cidades...');
     const buscarCidades = async () => {
       try {
+        console.log('🌆 Fazendo requisição para /cidades');
         const response = await fetch('http://localhost:3333/cidades');
         const cidadesData = await response.json();
+        console.log('🌆 Cidades recebidas:', cidadesData);
         setCidades(cidadesData);
       } catch (error) {
+        console.error('❌ Erro ao carregar cidades:', error);
         setErro('Erro ao carregar cidades');
       }
     };
@@ -38,66 +44,124 @@ const RelatorioCaronasOfertadas: React.FC = () => {
   }, []);
 
   const buscarRelatorio = async () => {
+    console.log('🚀 INICIANDO buscarRelatorio()');
+    
     if (!dataEspecifica) {
+      console.log('❌ Data não especificada');
       setErro('Selecione uma data específica para filtrar');
       return;
     }
 
+    console.log('✅ Data especificada, iniciando busca...');
     setLoading(true);
     setErro('');
     
     try {
       // Buscar dados dos endpoints que funcionam
-      const [motoristasResponse, oferecimentoCaronaResponse] = await Promise.all([
-        fetch('http://localhost:3333/motoristas'),
-        fetch('http://localhost:3333/oferecimentoCarona')
-      ]);
+      const oferecimentoCaronaResponse = await fetch('http://localhost:3333/oferecimentoCarona');
 
-      if (!motoristasResponse.ok || !oferecimentoCaronaResponse.ok) {
-        throw new Error('Erro ao buscar dados');
+      if (!oferecimentoCaronaResponse.ok) {
+        throw new Error('Erro ao buscar dados de oferecimentos');
       }
 
-      const motoristas = await motoristasResponse.json();
       const oferecimentos = await oferecimentoCaronaResponse.json();
 
+      console.log('✅ Dados carregados:', {
+        oferecimentos: oferecimentos.length
+      });
+
       // Processar dados no frontend
-      const dataEspecificaObj = new Date(dataEspecifica);
+      const dataEspecificaObj = new Date(dataEspecifica + 'T00:00:00');
+      const dataEspecificaFim = new Date(dataEspecifica + 'T23:59:59');
+      
+      console.log('🎯 Filtros aplicados:', {
+        dataEspecifica,
+        dataEspecificaObj: dataEspecificaObj.toISOString(),
+        dataEspecificaFim: dataEspecificaFim.toISOString(),
+        origemSelecionada: origemSelecionada || 'Todas',
+        destinoSelecionado: destinoSelecionado || 'Todas'
+      });
+
       const relatorioProcessado: RelatorioCaronasOfertadas[] = [];
 
       oferecimentos.forEach((oferta: any) => {
         const dataOferta = new Date(oferta.data);
+        const dentroIntervalo = dataOferta >= dataEspecificaObj && dataOferta <= dataEspecificaFim;
         
-        // Filtrar por data específica (mesmo dia)
-        if (dataOferta.toDateString() === dataEspecificaObj.toDateString()) {
-          const motorista = motoristas.find((m: any) => m.id === oferta.motoristaId);
+        console.log(`🔍 Oferta ${oferta.id}:`, {
+          dataOriginal: oferta.data,
+          dataOferta: dataOferta.toISOString(),
+          dataEspecificaObj: dataEspecificaObj.toISOString(),
+          dataEspecificaFim: dataEspecificaFim.toISOString(),
+          dentroIntervalo,
+          origemId: oferta.origemId,
+          origemNome: oferta.origem?.nomeCidade,
+          destinoId: oferta.destinoId,
+          destinoNome: oferta.destino?.nomeCidade,
+          motoristaId: oferta.motoristaId,
+          motoristaNome: oferta.motorista?.nome
+        });
+        
+        // Verificar especificamente a oferta 4 (Jerônimo Monteiro → Alegre)
+        if (oferta.id === 4) {
+          console.log('🎯 OFERTA 4 (Jerônimo Monteiro → Alegre) ENCONTRADA:', {
+            data: oferta.data,
+            dataOferta: dataOferta,
+            dentroIntervalo,
+            origem: oferta.origem,
+            destino: oferta.destino,
+            motorista: oferta.motorista
+          });
+        }
+        
+        // Filtrar por data específica
+        if (dentroIntervalo) {
+          console.log(`✅ Oferta ${oferta.id} está dentro do período`);
           
-          // Filtros opcionais por origem e destino (se implementados no futuro)
+          // Aplicar filtros de origem e destino se especificados
           let incluir = true;
           
-          // Por enquanto, como não temos origem/destino nos dados, incluímos todos
-          // if (origemSelecionada && oferta.origemId !== parseInt(origemSelecionada)) {
-          //   incluir = false;
-          // }
-          // if (destinoSelecionado && oferta.destinoId !== parseInt(destinoSelecionado)) {
-          //   incluir = false;
-          // }
+          if (origemSelecionada && oferta.origemId !== parseInt(origemSelecionada)) {
+            incluir = false;
+            console.log(`❌ Oferta ${oferta.id} filtrada por origem (esperado: ${origemSelecionada}, atual: ${oferta.origemId})`);
+          }
+          
+          if (destinoSelecionado && oferta.destinoId !== parseInt(destinoSelecionado)) {
+            incluir = false;
+            console.log(`❌ Oferta ${oferta.id} filtrada por destino (esperado: ${destinoSelecionado}, atual: ${oferta.destinoId})`);
+          }
 
-          if (incluir && motorista) {
-            relatorioProcessado.push({
+          if (incluir) {
+            console.log(`✅ Oferta ${oferta.id} incluída no relatório`);
+            
+            const itemRelatorio = {
               carona_id: oferta.id,
-              motorista: motorista.nome,
+              motorista: oferta.motorista?.nome || 'Motorista não encontrado',
               horario_saida: oferta.data,
               valor: oferta.preco,
-              origem: oferta.origem || 'N/A',
-              destino: oferta.destino || 'N/A'
-            });
+              origem: oferta.origem?.nomeCidade || 'N/A',
+              destino: oferta.destino?.nomeCidade || 'N/A'
+            };
+            
+            // Log especial para a oferta 4
+            if (oferta.id === 4) {
+              console.log('🎯 OFERTA 4 ADICIONADA AO RELATÓRIO:', itemRelatorio);
+            }
+            
+            relatorioProcessado.push(itemRelatorio);
+          } else {
+            console.log(`❌ Oferta ${oferta.id} NÃO incluída no relatório`);
           }
+        } else {
+          console.log(`⚠️ Oferta ${oferta.id} fora do período`);
         }
       });
 
+      console.log('📊 Relatório final:', relatorioProcessado);
       setRelatorioOfertadas(relatorioProcessado);
+      
     } catch (error) {
-      console.error('Erro:', error);
+      console.error('❌ Erro:', error);
       setErro('Erro ao buscar dados para o relatório');
     } finally {
       setLoading(false);
@@ -105,6 +169,7 @@ const RelatorioCaronasOfertadas: React.FC = () => {
   };
 
   const handleBuscar = () => {
+    console.log('🔍 CLICOU NO BOTÃO BUSCAR');
     setErro('');
     buscarRelatorio();
   };
@@ -131,10 +196,18 @@ const RelatorioCaronasOfertadas: React.FC = () => {
               <h5 className="mb-0">🔍 Filtros</h5>
             </div>
             <div className="card-body">
+              <div className="alert alert-warning mb-3">
+                <small>
+                  <strong>💡 Dica:</strong> Os dados de teste incluem oferecimentos em <strong>01/10/2025</strong> e <strong>25/06/2025</strong>.
+                  Para ver resultados, use uma dessas datas no filtro.
+                </small>
+              </div>
               <div className="row">
                 <div className="col-md-3">
-                  <label className="form-label">Data Específica</label>
+                  <label className="form-label" htmlFor="dataEspecifica">Data Específica</label>
                   <input
+                    id="dataEspecifica"
+                    name="dataEspecifica"
                     type="date"
                     className="form-control"
                     value={dataEspecifica}
@@ -142,8 +215,10 @@ const RelatorioCaronasOfertadas: React.FC = () => {
                   />
                 </div>
                 <div className="col-md-3">
-                  <label className="form-label">Origem (Opcional)</label>
+                  <label className="form-label" htmlFor="origemSelecionada">Origem (Opcional)</label>
                   <select
+                    id="origemSelecionada"
+                    name="origemSelecionada"
                     className="form-control"
                     value={origemSelecionada}
                     onChange={(e) => setOrigemSelecionada(e.target.value)}
@@ -155,8 +230,10 @@ const RelatorioCaronasOfertadas: React.FC = () => {
                   </select>
                 </div>
                 <div className="col-md-3">
-                  <label className="form-label">Destino (Opcional)</label>
+                  <label className="form-label" htmlFor="destinoSelecionado">Destino (Opcional)</label>
                   <select
+                    id="destinoSelecionado"
+                    name="destinoSelecionado"
                     className="form-control"
                     value={destinoSelecionado}
                     onChange={(e) => setDestinoSelecionado(e.target.value)}
@@ -185,11 +262,36 @@ const RelatorioCaronasOfertadas: React.FC = () => {
             <h4>Caronas Ofertadas</h4>
             <p className="text-muted">Listagem de caronas ofertadas para uma data específica, opcionalmente filtradas por origem/destino.</p>
             
-            {relatorioOfertadas.length === 0 ? (
+            {/* Informações de Debug */}
+            {loading && (
               <div className="alert alert-info">
-                Nenhuma carona encontrada para os filtros selecionados. Clique em "Buscar" para carregar os dados.
+                <div className="spinner-border spinner-border-sm me-2"></div>
+                Carregando dados do servidor...
               </div>
-            ) : (
+            )}
+            
+            {relatorioOfertadas.length === 0 && !loading ? (
+              <div className="alert alert-info">
+                <h6>Nenhuma carona encontrada</h6>
+                <p>Possíveis motivos:</p>
+                <ul>
+                  <li>Não há caronas ofertadas para a data selecionada</li>
+                  <li>Os filtros de origem/destino estão muito restritivos</li>
+                  <li>Verifique se há dados no banco de dados</li>
+                </ul>
+                <p className="mb-0">
+                  <strong>Dica:</strong> Abra o Console do navegador (F12) para ver logs detalhados.
+                </p>
+                <p className="mt-2 mb-0">
+                  <small>
+                    <strong>Dados disponíveis (baseado nos últimos dados carregados):</strong><br/>
+                    • Oferecimentos com datas: 2025-10-01 e 2025-06-25<br/>
+                    • Cidades: Alegre, Cachoeiro de Itapemirim, Castelo, Jerônimo Monteiro<br/>
+                    • Para teste, tente usar a data "2025-10-01" sem filtros de origem/destino
+                  </small>
+                </p>
+              </div>
+            ) : relatorioOfertadas.length > 0 ? (
               <>
                 <div className="table-responsive">
                   <table className="table table-striped">
@@ -240,6 +342,10 @@ const RelatorioCaronasOfertadas: React.FC = () => {
                   </div>
                 </div>
               </>
+            ) : (
+              <div className="alert alert-secondary">
+                👆 Selecione uma data específica e clique em "Buscar" para carregar o relatório.
+              </div>
             )}
           </div>
         </div>

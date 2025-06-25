@@ -15,6 +15,8 @@ type RelatorioMontanteMotorista = {
 };
 
 const RelatorioMontanteMotorista: React.FC = () => {
+  console.log('🎯 COMPONENTE RelatorioMontanteMotorista CARREGADO');
+  
   const [loading, setLoading] = useState<boolean>(false);
   const [erro, setErro] = useState<string>('');
   const [dataInicio, setDataInicio] = useState<string>('');
@@ -22,16 +24,21 @@ const RelatorioMontanteMotorista: React.FC = () => {
   const [relatorioMontante, setRelatorioMontante] = useState<RelatorioMontanteMotorista[]>([]);
 
   const buscarRelatorioMontanteMotoristas = async () => {
+    console.log('🚀 INICIANDO buscarRelatorioMontanteMotoristas()');
+    
     if (!dataInicio || !dataFim) {
+      console.log('❌ Dados incompletos:', { dataInicio, dataFim });
       setErro('Selecione o período (data início e fim) para filtrar');
       return;
     }
 
+    console.log('✅ Dados completos, iniciando busca...');
     setLoading(true);
     setErro('');
     
     try {
       // Buscar dados dos endpoints que funcionam
+      console.log('📡 Fazendo requisições para APIs...');
       const [motoristasResponse, aceiteCaronaResponse, oferecimentoCaronaResponse] = await Promise.all([
         fetch('http://localhost:3333/motoristas'),
         fetch('http://localhost:3333/aceiteCarona'),
@@ -46,40 +53,90 @@ const RelatorioMontanteMotorista: React.FC = () => {
       const aceites = await aceiteCaronaResponse.json();
       const oferecimentos = await oferecimentoCaronaResponse.json();
 
+      console.log('✅ Dados carregados:', {
+        motoristas: motoristas.length,
+        aceites: aceites.length,
+        oferecimentos: oferecimentos.length
+      });
+      
+      // Log de alguns dados para debug
+      console.log('Primeiros motoristas:', motoristas.slice(0, 3));
+      console.log('Primeiros aceites:', aceites.slice(0, 5));
+      console.log('Primeiros oferecimentos:', oferecimentos.slice(0, 3));
+
       // Processar dados no frontend
-      const dataInicioObj = new Date(dataInicio);
-      const dataFimObj = new Date(dataFim);
+      const dataInicioObj = new Date(dataInicio + 'T00:00:00');
+      const dataFimObj = new Date(dataFim + 'T23:59:59');
+      
+      console.log('🎯 Filtros aplicados:', {
+        dataInicioString: dataInicio,
+        dataFimString: dataFim,
+        dataInicioObj: dataInicioObj.toISOString(),
+        dataFimObj: dataFimObj.toISOString()
+      });
+      
+      // Log das datas dos oferecimentos para debug
+      console.log('Datas dos oferecimentos:', oferecimentos.map((o: any) => ({
+        id: o.id,
+        data: o.data,
+        dataObj: new Date(o.data).toISOString(),
+        motoristaId: o.motoristaId
+      })));
 
       const relatorioProcessado: RelatorioMontanteMotorista[] = [];
 
+      console.log('🔄 Processando motoristas...');
       motoristas.forEach((motorista: any) => {
+        console.log(`👤 Processando motorista: ${motorista.nome} (ID: ${motorista.id})`);
+        
         const ofertasDoMotorista = oferecimentos.filter((of: any) => of.motoristaId === motorista.id);
+        console.log(`📋 Motorista ${motorista.nome} tem ${ofertasDoMotorista.length} ofertas`);
         
         let valorTotalMotorista = 0;
         const trajetosMotorista: any[] = [];
 
         ofertasDoMotorista.forEach((oferta: any) => {
           const dataOferta = new Date(oferta.data);
+          const dentroIntervalo = dataOferta >= dataInicioObj && dataOferta <= dataFimObj;
+          
+          console.log(`🔍 Oferta ${oferta.id} do motorista ${motorista.nome}:`, {
+            dataOriginal: oferta.data,
+            dataOferta: dataOferta.toISOString(),
+            dentroIntervalo,
+            origemNome: oferta.origem?.nomeCidade,
+            destinoNome: oferta.destino?.nomeCidade
+          });
           
           // Filtrar por período
-          if (dataOferta >= dataInicioObj && dataOferta <= dataFimObj) {
+          if (dentroIntervalo) {
+            console.log(`✅ Oferta ${oferta.id} está dentro do período`);
+            
             const aceitesOferta = aceites.filter((aceite: any) => aceite.oferecimentoCaronaId === oferta.id);
+            console.log(`📊 Oferta ${oferta.id} tem ${aceitesOferta.length} aceites`);
             
             if (aceitesOferta.length > 0) {
               const valorTotalTrajeto = aceitesOferta.length * oferta.preco;
               valorTotalMotorista += valorTotalTrajeto;
 
+              console.log(`💰 Trajeto adicionado: ${aceitesOferta.length} aceites × R$ ${oferta.preco} = R$ ${valorTotalTrajeto}`);
+
               trajetosMotorista.push({
-                origem: oferta.origem || 'N/A',
-                destino: oferta.destino || 'N/A',
+                origem: oferta.origem?.nomeCidade || 'N/A',
+                destino: oferta.destino?.nomeCidade || 'N/A',
                 total_aceites: aceitesOferta.length,
                 valor_unitario: oferta.preco,
                 valor_total_trajeto: valorTotalTrajeto,
                 oferecimento_id: oferta.id
               });
+            } else {
+              console.log(`⚠️ Oferta ${oferta.id} não tem aceites`);
             }
+          } else {
+            console.log(`⚠️ Oferta ${oferta.id} fora do período`);
           }
         });
+
+        console.log(`💰 Motorista ${motorista.nome} - Valor total: R$ ${valorTotalMotorista}, Trajetos: ${trajetosMotorista.length}`);
 
         if (valorTotalMotorista > 0) {
           relatorioProcessado.push({
@@ -91,16 +148,19 @@ const RelatorioMontanteMotorista: React.FC = () => {
         }
       });
 
+      console.log('📊 Relatório final:', relatorioProcessado);
       setRelatorioMontante(relatorioProcessado);
     } catch (error) {
-      console.error('Erro:', error);
-      setErro('Erro ao buscar dados para o relatório');
+      console.error('❌ Erro:', error);
+      setErro('Erro ao buscar dados para o relatório: ' + (error as Error).message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleBuscar = () => {
+    console.log('🔍 CLICOU NO BOTÃO BUSCAR');
+    setErro('');
     buscarRelatorioMontanteMotoristas();
   };
 
@@ -126,10 +186,18 @@ const RelatorioMontanteMotorista: React.FC = () => {
               <h5 className="mb-0">🔍 Filtros</h5>
             </div>
             <div className="card-body">
+              <div className="alert alert-warning mb-3">
+                <small>
+                  <strong>💡 Dica:</strong> Os dados de teste incluem oferecimentos em <strong>01/10/2025</strong> e <strong>25/06/2025</strong>.
+                  Para ver resultados, use um período que inclua essas datas.
+                </small>
+              </div>
               <div className="row">
                 <div className="col-md-4">
-                  <label className="form-label">Data Início</label>
+                  <label className="form-label" htmlFor="dataInicio">Data Início</label>
                   <input
+                    id="dataInicio"
+                    name="dataInicio"
                     type="date"
                     className="form-control"
                     value={dataInicio}
@@ -137,8 +205,10 @@ const RelatorioMontanteMotorista: React.FC = () => {
                   />
                 </div>
                 <div className="col-md-4">
-                  <label className="form-label">Data Fim</label>
+                  <label className="form-label" htmlFor="dataFim">Data Fim</label>
                   <input
+                    id="dataFim"
+                    name="dataFim"
                     type="date"
                     className="form-control"
                     value={dataFim}
@@ -167,11 +237,34 @@ const RelatorioMontanteMotorista: React.FC = () => {
               Relatório financeiro com o valor total arrecadado por cada motorista no período, com detalhamento por trajeto.
             </p>
             
-            {relatorioMontante.length === 0 ? (
+            {/* Informações de Debug */}
+            {loading && (
               <div className="alert alert-info">
-                Nenhum dado encontrado para o período selecionado. Clique em "Buscar" para carregar os dados.
+                <div className="spinner-border spinner-border-sm me-2"></div>
+                Carregando dados do servidor...
               </div>
-            ) : (
+            )}
+            
+            {relatorioMontante.length === 0 && !loading ? (
+              <div className="alert alert-info">
+                <h6>Nenhum montante encontrado</h6>
+                <p>Possíveis motivos:</p>
+                <ul>
+                  <li>Não há caronas aceitas no período selecionado</li>
+                  <li>Os motoristas não tiveram caronas aceitas neste período</li>
+                  <li>Verifique se há dados no banco de dados</li>
+                </ul>
+                <p className="mb-0">
+                  <strong>Dica:</strong> Abra o Console do navegador (F12) para ver logs detalhados.
+                </p>
+                <p className="mt-2 mb-0">
+                  <small>
+                    <strong>Para teste, use o período de 2025-10-01 a 2025-10-01</strong><br/>
+                    Motoristas com caronas aceitas: Cristiano, Messi
+                  </small>
+                </p>
+              </div>
+            ) : relatorioMontante.length > 0 ? (
               <>
                 <div className="table-responsive">
                   <table className="table table-striped">
@@ -217,6 +310,10 @@ const RelatorioMontanteMotorista: React.FC = () => {
                   </strong>
                 </div>
               </>
+            ) : (
+              <div className="alert alert-secondary">
+                👆 Selecione o período (data início e fim) e clique em "Buscar" para carregar o relatório.
+              </div>
             )}
           </div>
         </div>

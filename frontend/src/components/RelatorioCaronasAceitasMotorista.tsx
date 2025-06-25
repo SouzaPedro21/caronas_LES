@@ -162,7 +162,7 @@ const RelatorioCaronasAceitasMotorista: React.FC = () => {
                           <td>{item.id}</td>
                           <td>{item.nome}</td>
                           <td>
-                            <span className="badge badge-success badge-lg">
+                            <span className="badge badge-black badge-lg">
                               {item.total_caronas_aceitas}
                             </span>
                           </td>
