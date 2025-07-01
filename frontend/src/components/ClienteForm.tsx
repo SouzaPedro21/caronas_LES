@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const initialState = {
   nome: '',
@@ -7,13 +7,94 @@ const initialState = {
   telefone: '',
 };
 
-type Cliente = typeof initialState;
+type Cliente = typeof initialState & { id?: number };
+
+type ClienteListado = {
+  id: number;
+  nome: string;
+  cpf: string;
+  sexo: string;
+  telefone: string;
+};
 
 const ClienteForm = () => {
   const [form, setForm] = useState<Cliente>(initialState);
   const [mensagem, setMensagem] = useState<string>('');
   const [erros, setErros] = useState<Partial<Cliente>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [clientes, setClientes] = useState<ClienteListado[]>([]);
+  const [mostrarLista, setMostrarLista] = useState<boolean>(true);
+  const [carregandoLista, setCarregandoLista] = useState<boolean>(false);
+  const [clienteEditando, setClienteEditando] = useState<number | null>(null);
+  const [excluindoCliente, setExcluindoCliente] = useState<number | null>(null);
+
+  const buscarClientes = async () => {
+    setCarregandoLista(true);
+    try {
+      const resp = await fetch('http://localhost:3333/clientes');
+      if (resp.ok) {
+        const data = await resp.json();
+        setClientes(data);
+      } else {
+        console.error('Erro ao buscar clientes');
+      }
+    } catch (err) {
+      console.error('Erro de conexão ao buscar clientes:', err);
+    } finally {
+      setCarregandoLista(false);
+    }
+  };
+
+  useEffect(() => {
+    buscarClientes();
+  }, []);
+
+  const editarCliente = (cliente: ClienteListado) => {
+    setForm({
+      nome: cliente.nome,
+      cpf: cliente.cpf,
+      sexo: cliente.sexo,
+      telefone: cliente.telefone,
+      id: cliente.id
+    });
+    setClienteEditando(cliente.id);
+    setMensagem('');
+    setErros({});
+    // Scroll para o formulário
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelarEdicao = () => {
+    setForm(initialState);
+    setClienteEditando(null);
+    setErros({});
+    setMensagem('');
+  };
+
+  const excluirCliente = async (id: number) => {
+    if (!confirm('Tem certeza que deseja excluir este cliente?')) {
+      return;
+    }
+
+    setExcluindoCliente(id);
+    try {
+      const resp = await fetch(`http://localhost:3333/clientes/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (resp.ok) {
+        setMensagem('Cliente excluído com sucesso!');
+        buscarClientes();
+      } else {
+        const data = await resp.json();
+        setMensagem(data.message || 'Erro ao excluir cliente.');
+      }
+    } catch (err) {
+      setMensagem('Erro de conexão com o servidor.');
+    } finally {
+      setExcluindoCliente(null);
+    }
+  };
 
   const validar = (): boolean => {
     const novosErros: Partial<Cliente> = {};
@@ -48,21 +129,32 @@ const ClienteForm = () => {
     
     setIsLoading(true);
     try {
-      const resp = await fetch('http://localhost:3333/clientes', {
-        method: 'POST',
+      const isEdit = clienteEditando !== null;
+      const url = isEdit 
+        ? `http://localhost:3333/clientes/${clienteEditando}`
+        : 'http://localhost:3333/clientes';
+      const method = isEdit ? 'PUT' : 'POST';
+      
+      const resp = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
+      
       if (resp.ok) {
-        setMensagem('Cliente cadastrado com sucesso!');
+        setMensagem(isEdit ? 'Cliente atualizado com sucesso!' : 'Cliente cadastrado com sucesso!');
         setForm(initialState);
         setErros({});
+        setClienteEditando(null);
+        // Atualizar a lista de clientes após cadastro/edição
+        buscarClientes();
       } else {
         const data = await resp.json();
-        setMensagem(data.message || 'Erro ao cadastrar cliente.');
+        setMensagem(data.message || `Erro ao ${isEdit ? 'atualizar' : 'cadastrar'} cliente.`);
       }
     } catch (err) {
-      setMensagem('Erro de conexão com o servidor.');    } finally {
+      setMensagem('Erro de conexão com o servidor.');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -72,8 +164,14 @@ const ClienteForm = () => {
       <div className="card">
         <div className="card-header">
           <h2 className="card-title">
-            <span className="icon-badge icon-badge-pessoa">👤</span> Cadastro de Cliente
+            <span className="icon-badge icon-badge-pessoa">👤</span> 
+            {clienteEditando ? 'Editar Cliente' : 'Cadastro de Cliente'}
           </h2>
+          {clienteEditando && (
+            <div className="alert alert-info mt-2 mb-0">
+              ℹ️ Editando cliente ID: <strong>{clienteEditando}</strong>
+            </div>
+          )}
         </div>
         <div className="card-body">
           {mensagem && (
@@ -144,26 +242,156 @@ const ClienteForm = () => {
                 {isLoading ? (
                   <>
                     <span className="loading-spinner"></span>
-                    Cadastrando...
+                    {clienteEditando ? 'Atualizando...' : 'Cadastrando...'}
                   </>
                 ) : (
-                  'Cadastrar Cliente'
+                  clienteEditando ? 'Atualizar Cliente' : 'Cadastrar Cliente'
                 )}
               </button>
-              <button 
-                type="button" 
-                className="btn btn-secondary"
-                onClick={() => {
-                  setForm(initialState);
-                  setErros({});
-                  setMensagem('');
-                }}
-              >
-                Limpar Formulário
-              </button>
+              
+              {clienteEditando ? (
+                <button 
+                  type="button" 
+                  className="btn btn-warning"
+                  onClick={cancelarEdicao}
+                >
+                  Cancelar Edição
+                </button>
+              ) : (
+                <button 
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setForm(initialState);
+                    setErros({});
+                    setMensagem('');
+                  }}
+                >
+                  Limpar Formulário
+                </button>
+              )}
             </div>
           </form>
         </div>
+      </div>
+
+      {/* Seção de listagem de clientes */}
+      <div className="card mt-4">
+        <div className="card-header d-flex justify-content-between align-items-center">
+          <h3 className="card-title">
+            <span className="icon-badge icon-badge-pessoa">📋</span> Clientes Cadastrados
+          </h3>
+          <button 
+            type="button" 
+            className="btn btn-outline-primary btn-sm"
+            onClick={() => setMostrarLista(!mostrarLista)}
+          >
+            {mostrarLista ? 'Ocultar Lista' : 'Mostrar Lista'}
+          </button>
+        </div>
+        
+        {mostrarLista && (
+          <div className="card-body">
+            {carregandoLista ? (
+              <div className="text-center">
+                <span className="loading-spinner"></span>
+                <span className="ms-2">Carregando clientes...</span>
+              </div>
+            ) : clientes.length === 0 ? (
+              <div className="alert alert-info">
+                ℹ️ Nenhum cliente cadastrado ainda.
+              </div>
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-striped table-hover">
+                  <thead className="table-dark">
+                    <tr>
+                      <th style={{ width: '80px' }}>ID</th>
+                      <th>Nome</th>
+                      <th style={{ width: '140px' }}>CPF</th>
+                      <th style={{ width: '100px' }}>Sexo</th>
+                      <th style={{ width: '150px' }}>Telefone</th>
+                      <th className="text-center" style={{ width: '100px' }}>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {clientes.map((cliente) => (
+                      <tr key={cliente.id}>
+                        <td>
+                          <span className="badge bg-secondary">{cliente.id}</span>
+                        </td>
+                        <td>
+                          <strong>{cliente.nome}</strong>
+                        </td>
+                        <td>
+                          <code style={{ whiteSpace: 'nowrap' }}>{cliente.cpf}</code>
+                        </td>
+                        <td>
+                          <span className={`badge ${cliente.sexo === 'M' ? 'bg-primary' : 'bg-success'}`}>
+                            {cliente.sexo === 'M' ? 'Masculino' : 'Feminino'}
+                          </span>
+                        </td>
+                        <td>
+                          <code style={{ whiteSpace: 'nowrap' }}>📞 {cliente.telefone}</code>
+                        </td>
+                        <td>
+                          <div className="d-flex gap-1 justify-content-center">
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary btn-sm p-1"
+                              onClick={() => editarCliente(cliente)}
+                              disabled={clienteEditando === cliente.id || excluindoCliente === cliente.id}
+                              title="Editar cliente"
+                              style={{ minWidth: '32px', height: '32px' }}
+                            >
+                              {clienteEditando === cliente.id ? (
+                                <span className="loading-spinner" style={{ fontSize: '12px' }}></span>
+                              ) : (
+                                "✏️"
+                              )}
+                            </button>
+                            
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm p-1"
+                              onClick={() => excluirCliente(cliente.id)}
+                              disabled={excluindoCliente === cliente.id || clienteEditando === cliente.id}
+                              title="Excluir cliente"
+                              style={{ minWidth: '32px', height: '32px' }}
+                            >
+                              {excluindoCliente === cliente.id ? (
+                                <span className="loading-spinner" style={{ fontSize: '12px' }}></span>
+                              ) : (
+                                "🗑️"
+                              )}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                <div className="mt-3">
+                  <small className="text-muted">
+                    Total de clientes: <strong>{clientes.length}</strong>
+                  </small>
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-3 text-center">
+              <button 
+                type="button" 
+                className="btn btn-outline-secondary btn-sm"
+                onClick={buscarClientes}
+                disabled={carregandoLista}
+              >
+                🔄 Atualizar Lista
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

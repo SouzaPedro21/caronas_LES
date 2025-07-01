@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const initialState = {
   nome: '',
@@ -8,13 +8,96 @@ const initialState = {
   cnh: '',
 };
 
-type Motorista = typeof initialState;
+type Motorista = typeof initialState & { id?: number };
+
+type MotoristaListado = {
+  id: number;
+  nome: string;
+  cpf: string;
+  sexo: string;
+  telefone: string;
+  cnh: string;
+};
 
 const MotoristaForm = () => {
   const [form, setForm] = useState<Motorista>(initialState);
   const [mensagem, setMensagem] = useState<string>('');
   const [erros, setErros] = useState<Partial<Motorista>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [motoristas, setMotoristas] = useState<MotoristaListado[]>([]);
+  const [mostrarLista, setMostrarLista] = useState<boolean>(true);
+  const [carregandoLista, setCarregandoLista] = useState<boolean>(false);
+  const [motoristaEditando, setMotoristaEditando] = useState<number | null>(null);
+  const [excluindoMotorista, setExcluindoMotorista] = useState<number | null>(null);
+
+  const buscarMotoristas = async () => {
+    setCarregandoLista(true);
+    try {
+      const resp = await fetch('http://localhost:3333/motoristas');
+      if (resp.ok) {
+        const data = await resp.json();
+        setMotoristas(data);
+      } else {
+        console.error('Erro ao buscar motoristas');
+      }
+    } catch (err) {
+      console.error('Erro de conexão ao buscar motoristas:', err);
+    } finally {
+      setCarregandoLista(false);
+    }
+  };
+
+  useEffect(() => {
+    buscarMotoristas();
+  }, []);
+
+  const editarMotorista = (motorista: MotoristaListado) => {
+    setForm({
+      nome: motorista.nome,
+      cpf: motorista.cpf,
+      sexo: motorista.sexo,
+      telefone: motorista.telefone,
+      cnh: motorista.cnh,
+      id: motorista.id
+    });
+    setMotoristaEditando(motorista.id);
+    setMensagem('');
+    setErros({});
+    // Scroll para o formulário
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelarEdicao = () => {
+    setForm(initialState);
+    setMotoristaEditando(null);
+    setErros({});
+    setMensagem('');
+  };
+
+  const excluirMotorista = async (id: number) => {
+    if (!confirm('Tem certeza que deseja excluir este motorista?')) {
+      return;
+    }
+
+    setExcluindoMotorista(id);
+    try {
+      const resp = await fetch(`http://localhost:3333/motoristas/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (resp.ok) {
+        setMensagem('Motorista excluído com sucesso!');
+        buscarMotoristas();
+      } else {
+        const data = await resp.json();
+        setMensagem(data.message || 'Erro ao excluir motorista.');
+      }
+    } catch (err) {
+      setMensagem('Erro de conexão com o servidor.');
+    } finally {
+      setExcluindoMotorista(null);
+    }
+  };
 
   const validar = (): boolean => {
     const novosErros: Partial<Motorista> = {};
@@ -52,17 +135,28 @@ const MotoristaForm = () => {
     
     setIsLoading(true);
     try {
-      const resp = await fetch('http://localhost:3333/motoristas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },        body: JSON.stringify(form),
+      const isEdit = motoristaEditando !== null;
+      const url = isEdit 
+        ? `http://localhost:3333/motoristas/${motoristaEditando}`
+        : 'http://localhost:3333/motoristas';
+      const method = isEdit ? 'PUT' : 'POST';
+      
+      const resp = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
+      
       if (resp.ok) {
-        setMensagem('Motorista cadastrado com sucesso!');
+        setMensagem(isEdit ? 'Motorista atualizado com sucesso!' : 'Motorista cadastrado com sucesso!');
         setForm(initialState);
         setErros({});
+        setMotoristaEditando(null);
+        // Atualizar a lista de motoristas após cadastro/edição
+        buscarMotoristas();
       } else {
         const data = await resp.json();
-        setMensagem(data.message || 'Erro ao cadastrar motorista.');
+        setMensagem(data.message || `Erro ao ${isEdit ? 'atualizar' : 'cadastrar'} motorista.`);
       }
     } catch (err) {
       setMensagem('Erro de conexão com o servidor.');
@@ -73,7 +167,14 @@ const MotoristaForm = () => {
   return (
     <div className="form-container">
       <div className="card">        <div className="card-header">
-          <h2 className="card-title">� Cadastro de Motorista</h2>
+          <h2 className="card-title">
+            🚗 {motoristaEditando ? 'Editar Motorista' : 'Cadastro de Motorista'}
+          </h2>
+          {motoristaEditando && (
+            <div className="alert alert-info mt-2 mb-0">
+              ℹ️ Editando motorista ID: <strong>{motoristaEditando}</strong>
+            </div>
+          )}
         </div>
         <div className="card-body">
           {mensagem && (
@@ -157,26 +258,160 @@ const MotoristaForm = () => {
                 {isLoading ? (
                   <>
                     <span className="loading-spinner"></span>
-                    Cadastrando...
+                    {motoristaEditando ? 'Atualizando...' : 'Cadastrando...'}
                   </>
                 ) : (
-                  'Cadastrar Motorista'
+                  motoristaEditando ? 'Atualizar Motorista' : 'Cadastrar Motorista'
                 )}
               </button>
-              <button 
-                type="button" 
-                className="btn btn-secondary"
-                onClick={() => {
-                  setForm(initialState);
-                  setErros({});
-                  setMensagem('');
-                }}
-              >
-                Limpar Formulário
-              </button>
+              
+              {motoristaEditando ? (
+                <button 
+                  type="button" 
+                  className="btn btn-warning"
+                  onClick={cancelarEdicao}
+                >
+                  Cancelar Edição
+                </button>
+              ) : (
+                <button 
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setForm(initialState);
+                    setErros({});
+                    setMensagem('');
+                  }}
+                >
+                  Limpar Formulário
+                </button>
+              )}
             </div>
           </form>
         </div>
+      </div>
+
+      {/* Seção de listagem de motoristas */}
+      <div className="card mt-4">
+        <div className="card-header d-flex justify-content-between align-items-center">
+          <h3 className="card-title">
+            📋 Motoristas Cadastrados
+          </h3>
+          <button 
+            type="button" 
+            className="btn btn-outline-primary btn-sm"
+            onClick={() => setMostrarLista(!mostrarLista)}
+          >
+            {mostrarLista ? 'Ocultar Lista' : 'Mostrar Lista'}
+          </button>
+        </div>
+        
+        {mostrarLista && (
+          <div className="card-body">
+            {carregandoLista ? (
+              <div className="text-center">
+                <span className="loading-spinner"></span>
+                <span className="ms-2">Carregando motoristas...</span>
+              </div>
+            ) : motoristas.length === 0 ? (
+              <div className="alert alert-info">
+                ℹ️ Nenhum motorista cadastrado ainda.
+              </div>
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-striped table-hover">
+                  <thead className="table-dark">
+                    <tr>
+                      <th style={{ width: '80px' }}>ID</th>
+                      <th>Nome</th>
+                      <th style={{ width: '140px' }}>CPF</th>
+                      <th style={{ width: '100px' }}>Sexo</th>
+                      <th style={{ width: '150px' }}>Telefone</th>
+                      <th style={{ width: '150px' }}>CNH</th>
+                      <th className="text-center" style={{ width: '100px' }}>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {motoristas.map((motorista) => (
+                      <tr key={motorista.id}>
+                        <td>
+                          <span className="badge bg-secondary">{motorista.id}</span>
+                        </td>
+                        <td>
+                          <strong>{motorista.nome}</strong>
+                        </td>
+                        <td>
+                          <code style={{ whiteSpace: 'nowrap' }}>{motorista.cpf}</code>
+                        </td>
+                        <td>
+                          <span className={`badge ${motorista.sexo === 'M' ? 'bg-primary' : 'bg-success'}`}>
+                            {motorista.sexo === 'M' ? 'Masculino' : 'Feminino'}
+                          </span>
+                        </td>
+                        <td>
+                          <code style={{ whiteSpace: 'nowrap' }}>📞 {motorista.telefone}</code>
+                        </td>
+                        <td>
+                          <code style={{ whiteSpace: 'nowrap' }}>🆔 {motorista.cnh}</code>
+                        </td>
+                        <td>
+                          <div className="d-flex gap-1 justify-content-center">
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary btn-sm p-1"
+                              onClick={() => editarMotorista(motorista)}
+                              disabled={motoristaEditando === motorista.id || excluindoMotorista === motorista.id}
+                              title="Editar motorista"
+                              style={{ minWidth: '32px', height: '32px' }}
+                            >
+                              {motoristaEditando === motorista.id ? (
+                                <span className="loading-spinner" style={{ fontSize: '12px' }}></span>
+                              ) : (
+                                "✏️"
+                              )}
+                            </button>
+                            
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm p-1"
+                              onClick={() => excluirMotorista(motorista.id)}
+                              disabled={excluindoMotorista === motorista.id || motoristaEditando === motorista.id}
+                              title="Excluir motorista"
+                              style={{ minWidth: '32px', height: '32px' }}
+                            >
+                              {excluindoMotorista === motorista.id ? (
+                                <span className="loading-spinner" style={{ fontSize: '12px' }}></span>
+                              ) : (
+                                "🗑️"
+                              )}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                <div className="mt-3">
+                  <small className="text-muted">
+                    Total de motoristas: <strong>{motoristas.length}</strong>
+                  </small>
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-3 text-center">
+              <button 
+                type="button" 
+                className="btn btn-outline-secondary btn-sm"
+                onClick={buscarMotoristas}
+                disabled={carregandoLista}
+              >
+                🔄 Atualizar Lista
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
